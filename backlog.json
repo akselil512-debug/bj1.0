@@ -1,7 +1,7 @@
 {
   "_meta": {
     "schema_version": "1.1",
-    "generated_at": "2026-11-22T13:10:00Z",
+    "generated_at": "2026-11-22T21:45:00Z",
     "note": "Kaikki 19 storya on toteutettu ensimmäiseen testiversioon ja odottavat tuoteomistajan hyväksyntää (in_review). Koodi on repossa ja peli on julkaistu: https://akselil512-debug.github.io/bj1.0/",
     "language": "fi",
     "git_commit": "d022e40"
@@ -84,6 +84,13 @@
       "description": "Villin lännen käyttöliittymä puhelimelle, saavutettavuus ja automaattinen julkaisu.",
       "status": "in_review",
       "stories": ["STORY-015", "STORY-016", "STORY-017"]
+    },
+    {
+      "id": "EPIC-006",
+      "title": "Kasinolaajennus (MVP:n jälkeen)",
+      "description": "Uusi kiiltävä kasinoulkoasu designluonnosten pohjalta: aula, ruletti ja päivän pyörä. Moninpeli, tulostaulu, kokoelma ja live-jakaja odottavat palvelinta ja aineistoja.",
+      "status": "in_review",
+      "stories": ["STORY-021", "STORY-022", "STORY-023"]
     }
   ],
   "stories": [
@@ -385,6 +392,55 @@
         "Kädet pelataan vuorotellen, ja jokainen ratkaistaan erikseen jakajaa vastaan.",
         "Blackjack-käsi maksetaan heti, ja muut kädet jatkavat peliä.",
         "Vakuutus kattaa kaikki kädet."
+      ]
+    },
+    {
+      "id": "STORY-021",
+      "epic": "EPIC-006",
+      "title": "Ruletti",
+      "as_a": "pelaaja",
+      "i_want": "pelata eurooppalaista rulettia samalla saldolla",
+      "so_that": "saluunassa on muutakin pelattavaa kuin blackjack",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Pöydässä on numerot 0–36, tusinat ja tasarahapanokset.",
+        "Yksi numero maksaa 35:1, tusina 2:1 ja muut 1:1.",
+        "Jokaisen panoksen odotusarvo on -1/37, todennettu testillä.",
+        "Panosta ei voi asettaa yli saldon.",
+        "Pöytä toimii puhelimella sivusuunnassa vierittäen."
+      ]
+    },
+    {
+      "id": "STORY-022",
+      "epic": "EPIC-006",
+      "title": "Päivän pyörä ja päiväputki",
+      "as_a": "pelaaja",
+      "i_want": "yhden ilmaisen pyöräytyksen joka päivä",
+      "so_that": "minulla on syy palata peliin päivittäin",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Pyörää voi pyöräyttää kerran kalenteripäivässä.",
+        "Peräkkäisistä päivistä saa putkibonuksen, ja seitsemäntenä päivänä palkinto tuplataan.",
+        "Väliin jäänyt päivä aloittaa putken alusta.",
+        "Pyöräytys säilyy profiilissa sivun uudelleenlatauksen ja siirtokoodin yli."
+      ]
+    },
+    {
+      "id": "STORY-023",
+      "epic": "EPIC-006",
+      "title": "Aula ja uusi kasinoulkoasu",
+      "as_a": "pelaaja",
+      "i_want": "aulan, josta valitsen pelin, ja kiiltävän kasinoulkoasun",
+      "so_that": "peli tuntuu oikealta kasinolta",
+      "effort": "L",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Peli avautuu aulaan, josta pääsee blackjackiin, rulettiin ja päivän pyörään.",
+        "Alareunassa on viiden kohdan päävalikko.",
+        "Painikkeet, paneelit ja kortit noudattavat designluonnosten metallista ja lasimaista tyyliä.",
+        "Kaikki uudet näkymät läpäisevät axe-tarkistuksen WCAG 2.1 AA -säännöillä."
       ]
     }
   ],

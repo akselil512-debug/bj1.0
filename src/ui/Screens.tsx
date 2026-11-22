@@ -4,6 +4,7 @@ import { exportCode } from '../game/storage';
 import { PERFECT_PAIRS_TABLE, SPECIALS, TWENTY_ONE_PLUS_THREE_TABLE } from '../game/bonuses';
 import { BARREL_PRIZES, CART_PRIZES, EVENT_CHANCE, eventProbability, EVENTS, JACKPOT_MULTIPLIER } from '../game/extras';
 import { DECKS } from '../game/cards';
+import { STREAK_BONUS, WHEEL_PRIZES } from '../game/daily';
 import sim from '../game/sim-results.json';
 import { money, percent } from './common';
 
@@ -140,6 +141,28 @@ export function RulesScreen() {
           <li>Saluunan kellarissa on {BARREL_PRIZES.length} tynnyriä: {BARREL_PRIZES.filter((p) => typeof p === 'number').join(' ×, ')} × panos ja kultakaivoksen avain.</li>
           <li>Kultakaivos on bonuspelin bonuspeli. Siellä on {CART_PRIZES.length} vaunua: voitot 5–50 × panos ja yksi päävoitto.</li>
           <li>Päävoitto on tuhat blackjack-voittoa eli {JACKPOT_MULTIPLIER} × panos.</li>
+        </ul>
+      </section>
+
+      <section className="panel">
+        <h2>Ruletti</h2>
+        <ul className="rules">
+          <li>Eurooppalainen ruletti: numerot 0–36 ja yksi nolla.</li>
+          <li>Yhden numeron panos maksaa 35:1.</li>
+          <li>Tusinat 1–12, 13–24 ja 25–36 maksavat 2:1.</li>
+          <li>Punainen, musta, parillinen, pariton, 1–18 ja 19–36 maksavat 1:1.</li>
+          <li>Nolla häviää kaikki muut panokset paitsi panoksen nollalle.</li>
+          <li>Talon etu on jokaisessa panoksessa sama, 1/37 eli noin 2,7 %.</li>
+        </ul>
+      </section>
+
+      <section className="panel">
+        <h2>Päivän pyörä</h2>
+        <ul className="rules">
+          <li>Yksi ilmainen pyöräytys joka päivä. Palkinnot: {WHEEL_PRIZES.slice().sort((a, b) => a - b).filter((v, i, all) => all.indexOf(v) === i).map((v) => money(v)).join(', ')}.</li>
+          <li>Peräkkäisinä päivinä saat lisäksi putkibonuksen: {STREAK_BONUS.slice(0, 6).map((v) => money(v)).join(', ')}.</li>
+          <li>Seitsemäntenä päivänä pyörän palkinto maksetaan tuplana, ja putki alkaa sen jälkeen alusta.</li>
+          <li>Jos päivä jää väliin, putki alkaa alusta.</li>
         </ul>
       </section>
 

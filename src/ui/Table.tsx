@@ -198,6 +198,7 @@ export function Table({ profile, onUpdate, onSave, onBalance, notify }: Props) {
       )}
 
       <section className={round ? 'felt' : 'felt idle'} aria-label="Pelipöytä">
+        <div className="rack" aria-hidden="true" />
         <div className="seat">
           <h2 className="seat-title">
             Jakaja

@@ -171,8 +171,12 @@ Päätökset:
 | 2026-11-22 | Jaetut ässät saavat ottaa lisäkortteja (Docin valinta, vahvistettava). Sivupanos on kymmenesosa pääpanoksesta. |
 | 2026-11-22 | Pelaaja voi pelata 1–5 kättä rinnakkain (STORY-020). Panos, sivupanokset ja bonukset ovat käsikohtaisia, vakuutus kattaa kaikki kädet. |
 | 2026-11-22 | Ilmoitukset näytetään yksi kerrallaan, jotta ne eivät peitä pöytää. Vitsirivi (JOKERI) jätetään vastauksista pois, koska roolileikki ärsytti käyttäjää. |
+| 2026-11-22 | Designluonnokset (canvas "Saloon 21 – nya designskisser", 11 näkymää) rakennetaan peliin vaiheittain. Vaihe 1: aula, uusi kiiltävä ulkoasu, eurooppalainen ruletti ja päivän pyörä (EPIC-006). |
+| 2026-11-22 | Käyttäjä kirjoittaa välillä ruotsiksi. Doc vastaa käyttäjän viestin kielellä, pelin tekstit pysyvät suomeksi. |
 
-Tilanne 2026-11-22: ensimmäinen versio on rakennettu (49 yksikkötestiä ja 5 selaintestiä läpi, mukana axe-saavutettavuustarkistus WCAG 2.1 AA -säännöillä jokaisella sivulla). Storyt ovat tilassa `in_review`. Simulaation tulos on tiedostossa `docs/simulation.md`: koko peli tapahtumineen on pelaajalle noin +434 % panoksesta kierrosta kohden.
+Tilanne 2026-11-22 ilta: peli avautuu aulaan, ja mukana ovat ruletti ja päivän pyörä (70 yksikkötestiä ja 8 selaintestiä läpi). Designista toteuttamatta: moninpelipöydät, pöytälista ja tulostaulu (vaativat palvelimen), kokoelma sekä live-jakaja (vaatii oman tai lisensoidun kuva- tai videoaineiston).
+
+Aiempi tilanne 2026-11-22: ensimmäinen versio on rakennettu (49 yksikkötestiä ja 5 selaintestiä läpi, mukana axe-saavutettavuustarkistus WCAG 2.1 AA -säännöillä jokaisella sivulla). Storyt ovat tilassa `in_review`. Simulaation tulos on tiedostossa `docs/simulation.md`: koko peli tapahtumineen on pelaajalle noin +434 % panoksesta kierrosta kohden.
 
 Avoimet kysymykset:
 

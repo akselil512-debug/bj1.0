@@ -3,6 +3,8 @@
 
 import type { Round } from './engine';
 import { roundNet } from './engine';
+import { DailyState, emptyDaily, WheelResult } from './daily';
+import type { SpinResult } from './roulette';
 
 export const START_BALANCE = 100_000;
 
@@ -33,6 +35,9 @@ export interface Stats {
   surrenders: number;
   pairsWins: number;
   t3Wins: number;
+  rouletteSpins: number;
+  rouletteStraightWins: number;
+  wheelSpins: number;
   specials: Record<string, number>;
 }
 
@@ -46,6 +51,7 @@ export interface Profile {
   achievements: Record<string, number>; // id -> unlock time
   settings: { hints: boolean; calm: boolean };
   tutorialDone: boolean;
+  daily: DailyState;
   createdAt: number;
 }
 
@@ -53,14 +59,15 @@ export const emptyStats = (): Stats => ({
   rounds: 0, hands: 0, wins: 0, losses: 0, pushes: 0, blackjacks: 0, decisions: 0, correct: 0,
   winStreak: 0, bestWinStreak: 0, correctStreak: 0, bestCorrectStreak: 0, biggestWin: 0,
   peakBalance: START_BALANCE, splits: 0, mostHands: 0, doublesWon: 0, refills: 0, bonusGames: 0,
-  mines: 0, jackpots: 0, events: 0, insuranceWins: 0, surrenders: 0, pairsWins: 0, t3Wins: 0, specials: {},
+  mines: 0, jackpots: 0, events: 0, insuranceWins: 0, surrenders: 0, pairsWins: 0, t3Wins: 0,
+  rouletteSpins: 0, rouletteStraightWins: 0, wheelSpins: 0, specials: {},
 });
 
 export function newProfile(name: string, pin: string, now: number): Profile {
   return {
     id: `p${now.toString(36)}${Math.floor(Math.random() * 1e6).toString(36)}`,
     name, pin, balance: START_BALANCE, xp: 0, stats: emptyStats(), achievements: {},
-    settings: { hints: true, calm: false }, tutorialDone: false, createdAt: now,
+    settings: { hints: true, calm: false }, tutorialDone: false, daily: emptyDaily(), createdAt: now,
   };
 }
 
@@ -114,6 +121,9 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'bonus-game', name: 'Tynnyrinavaaja', desc: 'Pelaa bonuspeli.', test: (p) => p.stats.bonusGames >= 1 },
   { id: 'mine', name: 'Kullankaivaja', desc: 'Pääse kultakaivokseen.', test: (p) => p.stats.mines >= 1 },
   { id: 'jackpot', name: 'Emäsuoni', desc: 'Voita kultakaivoksen päävoitto.', test: (p) => p.stats.jackpots >= 1 },
+  { id: 'roulette-first', name: 'Pyörä pyörimään', desc: 'Pyöräytä rulettia.', test: (p) => p.stats.rouletteSpins >= 1 },
+  { id: 'roulette-straight', name: 'Täysosuma', desc: 'Voita ruletissa yhden numeron panoksella.', test: (p) => p.stats.rouletteStraightWins >= 1 },
+  { id: 'wheel-week', name: 'Viikon putki', desc: 'Pyöräytä päivän pyörää seitsemänä päivänä peräkkäin.', test: (p) => p.daily.streak >= 7 },
   { id: 'millionaire', name: 'Miljonääri', desc: 'Kasvata saldosi miljoonaan.', test: (p) => p.stats.peakBalance >= 1_000_000 },
   { id: 'broke', name: 'Tyhjät taskut', desc: 'Pelaa saldosi loppuun.', test: (p) => p.stats.refills >= 1 },
   { id: 'level-5', name: 'Korttihai', desc: 'Saavuta taso 5.', test: (p) => levelFor(p.xp) >= 5 },
@@ -150,6 +160,7 @@ const clone = (p: Profile): Profile => ({
   stats: { ...p.stats, specials: { ...p.stats.specials } },
   achievements: { ...p.achievements },
   settings: { ...p.settings },
+  daily: { ...p.daily },
 });
 
 /** Applies a finished round to the profile. */
@@ -239,5 +250,25 @@ export function refillIfBroke(profile: Profile, minBet: number, now: number): Up
   const next = clone(profile);
   next.balance = START_BALANCE;
   next.stats.refills++;
+  return finalize(profile, next, now);
+}
+
+/** Applies a settled roulette spin. The stake has not been taken from the balance yet. */
+export function applyRoulette(profile: Profile, result: SpinResult, now: number): Update {
+  const next = clone(profile);
+  next.balance += result.net;
+  next.stats.rouletteSpins++;
+  if (result.winners.some((key) => key.startsWith('n'))) next.stats.rouletteStraightWins++;
+  next.stats.biggestWin = Math.max(next.stats.biggestWin, result.net);
+  next.xp += 5;
+  return finalize(profile, next, now);
+}
+
+export function applyDaily(profile: Profile, result: WheelResult, now: number): Update {
+  const next = clone(profile);
+  next.balance += result.total;
+  next.daily = result.state;
+  next.stats.wheelSpins++;
+  next.xp += 10;
   return finalize(profile, next, now);
 }

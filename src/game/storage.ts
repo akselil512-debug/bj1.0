@@ -1,6 +1,7 @@
 // Saving profiles on the device and moving them between devices with a transfer code.
 
 import { emptyStats, Profile } from './progress';
+import { emptyDaily } from './daily';
 
 const KEY = 'saloon21.v1';
 const PREFIX = 'S21';
@@ -88,6 +89,10 @@ function normalize(raw: any): Profile | null {
     achievements,
     settings: { hints: raw.settings?.hints !== false, calm: raw.settings?.calm === true },
     tutorialDone: raw.tutorialDone === true,
+    daily:
+      raw.daily && /^\d{4}-\d{2}-\d{2}$/.test(raw.daily.lastSpin) && isCount(raw.daily.streak) && raw.daily.streak <= 7
+        ? { lastSpin: raw.daily.lastSpin, streak: raw.daily.streak }
+        : emptyDaily(),
     createdAt: isCount(raw.createdAt) ? raw.createdAt : Date.now(),
   };
 }
