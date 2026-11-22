@@ -50,6 +50,15 @@ test('the guide can be skipped and hints can be switched off', async ({ page }) 
   await expect(page.locator('.action.best')).toHaveCount(0);
 });
 
+test('several hands can be played side by side', async ({ page }) => {
+  await enter(page);
+  await page.getByRole('button', { name: 'Enemmän käsiä' }).click();
+  await page.getByRole('button', { name: 'Enemmän käsiä' }).click();
+  await expect(page.locator('.stake-total')).toContainText('1 500');
+  await playRound(page);
+  expect(await page.locator('.hand').count()).toBeGreaterThanOrEqual(3);
+});
+
 test('side bet odds are visible before betting', async ({ page }) => {
   await enter(page);
   await page.getByRole('button', { name: 'Sivupanosten kertoimet' }).click();

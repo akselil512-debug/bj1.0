@@ -35,10 +35,16 @@ export function App() {
   useEffect(() => saveProfiles(store, profiles), [profiles]);
 
   const toast = useCallback((title: string, text: string) => {
-    const id = ++toastId;
-    setToasts((t) => [...t.slice(-2), { id, title, text }]);
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4000);
+    setToasts((t) => [...t, { id: ++toastId, title, text }]);
   }, []);
+
+  // Notices are shown one at a time so they never pile up over the table.
+  const currentToast = toasts[0];
+  useEffect(() => {
+    if (!currentToast) return;
+    const timer = setTimeout(() => setToasts((t) => t.slice(1)), 2600);
+    return () => clearTimeout(timer);
+  }, [currentToast]);
 
   const saveProfile = useCallback((next: Profile) => {
     setProfiles((list) => (list.some((p) => p.id === next.id) ? list.map((p) => (p.id === next.id ? next : p)) : [...list, next]));
@@ -84,7 +90,7 @@ export function App() {
           </span>
         </div>
         <div className="balance" aria-label={`Saldo ${money(balance)}`}>
-          <span className="balance-label">Saldo</span>
+          <span className="balance-label">Saldosi</span>
           <span className="balance-value">{money(balance)}</span>
         </div>
       </header>
@@ -119,12 +125,13 @@ export function App() {
       </main>
 
       <div className="toasts" aria-live="polite">
-        {toasts.map((t) => (
-          <div key={t.id} className="toast">
-            <strong>{t.title}</strong>
-            <span>{t.text}</span>
+        {currentToast && (
+          <div key={currentToast.id} className="toast">
+            <strong>{currentToast.title}</strong>
+            <span>{currentToast.text}</span>
+            {toasts.length > 1 && <span className="toast-more">+{toasts.length - 1}</span>}
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

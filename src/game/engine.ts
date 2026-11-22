@@ -1,7 +1,7 @@
 // Blackjack round engine. American rules:
 // 6 decks, blackjack pays 3:2, push returns the bet, dealer stands on all 17s,
 // dealer peeks for blackjack, double on any two cards (also after split),
-// unlimited re-splits, insurance, late surrender.
+// unlimited re-splits, insurance, late surrender. One to five hands per round.
 
 import { Card, Rng, handValue, isBlackjack, newShoe, RESHUFFLE_AT, cardValue } from './cards';
 import { evalPerfectPairs, evalTwentyOnePlusThree, initialSpecials, isLuckySevens, specialById } from './bonuses';
@@ -24,6 +24,7 @@ export interface Hand {
   extra: number; // stake added by the house (free double)
   doubled: boolean;
   fromSplit: boolean;
+  natural: boolean; // a two-card 21 dealt at the start of the round
   done: boolean;
   outcome?: Outcome;
   returned: number;
@@ -44,7 +45,8 @@ export interface Round {
   hands: Hand[];
   active: number;
   phase: Phase;
-  baseBet: number;
+  seats: number; // hands dealt at the start of the round
+  baseBet: number; // bet per hand
   startBalance: number; // balance before any bet of this round
   balance: number;
   insurance: number;
@@ -62,12 +64,14 @@ export interface StartOptions {
   shoe: Card[];
   rng: Rng;
   balance: number;
-  bet: number;
-  side?: { pp?: number; t3?: number };
+  bet: number; // per hand
+  hands?: number; // 1..MAX_HANDS, default 1
+  side?: { pp?: number; t3?: number }; // per hand
   mods?: Modifiers;
 }
 
 export const MIN_BET = 100;
+export const MAX_HANDS = 5;
 
 function draw(round: Round): Card {
   if (round.shoe.length === 0) round.shoe.push(...newShoe(round.rng));
@@ -90,21 +94,23 @@ function copy(round: Round): Round {
 }
 
 function newHand(cards: Card[], bet: number, fromSplit: boolean): Hand {
-  return { cards, bet, extra: 0, doubled: false, fromSplit, done: false, returned: 0 };
+  return { cards, bet, extra: 0, doubled: false, fromSplit, natural: false, done: false, returned: 0 };
 }
 
-function creditSpecial(round: Round, id: string) {
+function creditSpecial(round: Round, id: string, label = '') {
   const s = specialById(id);
   const amount = s.multiplier * round.baseBet;
   round.balance += amount;
-  round.bonusWins.push({ id: s.id, name: s.name, multiplier: s.multiplier, amount });
+  round.bonusWins.push({ id: s.id, name: label + s.name, multiplier: s.multiplier, amount });
 }
 
 export function startRound(opts: StartOptions): Round {
   const pp = opts.side?.pp ?? 0;
   const t3 = opts.side?.t3 ?? 0;
   if (opts.bet < MIN_BET) throw new Error('Bet is below the minimum');
-  if (opts.bet + pp + t3 > opts.balance) throw new Error('Not enough balance');
+  const seats = opts.hands ?? 1;
+  if (!Number.isInteger(seats) || seats < 1 || seats > MAX_HANDS) throw new Error('Invalid number of hands');
+  if ((opts.bet + pp + t3) * seats > opts.balance) throw new Error('Not enough balance');
 
   const round: Round = {
     shoe: opts.shoe,
@@ -113,9 +119,10 @@ export function startRound(opts: StartOptions): Round {
     hands: [],
     active: 0,
     phase: 'player',
+    seats,
     baseBet: opts.bet,
     startBalance: opts.balance,
-    balance: opts.balance - opts.bet - pp - t3,
+    balance: opts.balance - (opts.bet + pp + t3) * seats,
     insurance: 0,
     insuranceWon: false,
     side: { pp, t3 },
@@ -127,30 +134,36 @@ export function startRound(opts: StartOptions): Round {
     triggerBonusGame: false,
   };
 
-  const p1 = draw(round);
+  // Deal order: one card to each hand, dealer upcard, second card to each hand, dealer hole card.
+  const first = Array.from({ length: seats }, () => draw(round));
   const up = draw(round);
-  const p2 = draw(round);
+  const second = first.map(() => draw(round));
   const hole = draw(round);
   round.dealer = [up, hole];
-  round.hands = [newHand([p1, p2], opts.bet, false)];
+  round.hands = first.map((card, i) => newHand([card, second[i]], opts.bet, false));
 
-  if (pp > 0) {
-    const row = evalPerfectPairs(p1, p2);
-    if (row) {
-      const amount = pp * (row.pays + 1);
-      round.balance += amount;
-      round.sideWins.push({ id: 'perfect-pairs', name: `Perfect Pairs: ${row.name}`, multiplier: row.pays, amount });
+  round.hands.forEach((hand, i) => {
+    const [p1, p2] = hand.cards;
+    const label = seats > 1 ? `Käsi ${i + 1}: ` : '';
+    hand.natural = isBlackjack(hand.cards);
+    if (pp > 0) {
+      const row = evalPerfectPairs(p1, p2);
+      if (row) {
+        const amount = pp * (row.pays + 1);
+        round.balance += amount;
+        round.sideWins.push({ id: 'perfect-pairs', name: `${label}Perfect Pairs: ${row.name}`, multiplier: row.pays, amount });
+      }
     }
-  }
-  if (t3 > 0) {
-    const row = evalTwentyOnePlusThree(p1, p2, up);
-    if (row) {
-      const amount = t3 * (row.pays + 1);
-      round.balance += amount;
-      round.sideWins.push({ id: 'twenty-one-plus-three', name: `21+3: ${row.name}`, multiplier: row.pays, amount });
+    if (t3 > 0) {
+      const row = evalTwentyOnePlusThree(p1, p2, up);
+      if (row) {
+        const amount = t3 * (row.pays + 1);
+        round.balance += amount;
+        round.sideWins.push({ id: 'twenty-one-plus-three', name: `${label}21+3: ${row.name}`, multiplier: row.pays, amount });
+      }
     }
-  }
-  for (const s of initialSpecials([p1, p2])) creditSpecial(round, s.id);
+    for (const sp of initialSpecials(hand.cards)) creditSpecial(round, sp.id, label);
+  });
 
   if (up.r === 1) {
     round.phase = 'insurance';
@@ -159,7 +172,7 @@ export function startRound(opts: StartOptions): Round {
   return afterInsurance(round);
 }
 
-export const insuranceCost = (round: Round) => round.baseBet / 2;
+export const insuranceCost = (round: Round) => (round.baseBet / 2) * round.seats;
 export const canAffordInsurance = (round: Round) => round.balance >= insuranceCost(round);
 
 export function decideInsurance(prev: Round, take: boolean): Round {
@@ -175,19 +188,15 @@ export function decideInsurance(prev: Round, take: boolean): Round {
 
 function afterInsurance(round: Round): Round {
   const dealerBj = isBlackjack(round.dealer);
-  const playerBj = isBlackjack(round.hands[0].cards);
-  if (dealerBj) {
-    if (round.insurance > 0) {
-      round.balance += round.insurance * 3;
-      round.insuranceWon = true;
-    }
-    round.hands[0].done = true;
-    return finish(round);
+  if (dealerBj && round.insurance > 0) {
+    round.balance += round.insurance * 3;
+    round.insuranceWon = true;
   }
-  if (playerBj) {
-    round.hands[0].done = true;
-    return finish(round);
-  }
+  // Dealer blackjack ends every hand. A player's natural needs no decisions either.
+  for (const hand of round.hands) if (dealerBj || hand.natural) hand.done = true;
+  const next = round.hands.findIndex((hand) => !hand.done);
+  if (next === -1) return finish(round);
+  round.active = next;
   round.phase = 'player';
   return round;
 }
@@ -199,7 +208,7 @@ export function legalActions(round: Round): Action[] {
   if (hand.cards.length === 2) {
     if (round.balance >= hand.bet || round.mods.freeDouble) actions.push('double');
     if (hand.cards[0].r === hand.cards[1].r && round.balance >= hand.bet) actions.push('split');
-    if (!hand.fromSplit && round.hands.length === 1) actions.push('surrender');
+    if (!hand.fromSplit) actions.push('surrender');
   }
   return actions;
 }
@@ -263,11 +272,10 @@ export function act(prev: Round, action: Action): Round {
 function finish(round: Round): Round {
   round.dealerRevealed = true;
   round.active = Math.min(round.active, round.hands.length - 1);
-  const natural = round.hands.length === 1 && !round.hands[0].fromSplit && isBlackjack(round.hands[0].cards);
   const dealerBj = isBlackjack(round.dealer);
-  const live = round.hands.some((h) => h.outcome !== 'bust' && h.outcome !== 'surrender');
+  const live = round.hands.some((h) => !h.natural && h.outcome !== 'bust' && h.outcome !== 'surrender');
 
-  if (live && !natural && !dealerBj) {
+  if (live && !dealerBj) {
     while (handValue(round.dealer).total < 17) round.dealer.push(draw(round));
   }
   const dealerTotal = handValue(round.dealer).total;
@@ -280,12 +288,12 @@ function finish(round: Round): Round {
       hand.returned = hand.bet / 2;
     } else if (hand.outcome === 'bust') {
       hand.returned = 0;
-    } else if (natural && !dealerBj) {
+    } else if (hand.natural && !dealerBj) {
       hand.outcome = 'blackjack';
       hand.returned = hand.bet + hand.bet * (round.mods.blackjackPays ?? 1.5) * winMult;
     } else if (dealerBj) {
-      hand.outcome = natural ? 'push' : 'lose';
-      hand.returned = natural ? hand.bet : 0;
+      hand.outcome = hand.natural ? 'push' : 'lose';
+      hand.returned = hand.natural ? hand.bet : 0;
     } else if (dealerTotal > 21 || total > dealerTotal) {
       hand.outcome = 'win';
       hand.returned = hand.bet + (hand.bet + hand.extra) * winMult;
@@ -304,7 +312,7 @@ function finish(round: Round): Round {
     round.balance += hand.returned;
   }
 
-  round.triggerBonusGame = round.hands[0].outcome === 'blackjack';
+  round.triggerBonusGame = round.hands.some((h) => h.outcome === 'blackjack');
   round.phase = 'result';
   return round;
 }

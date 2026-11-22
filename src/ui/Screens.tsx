@@ -91,8 +91,9 @@ export function RulesScreen() {
           <li>Jakaja ottaa kortin 16:een asti ja jää 17:ään.</li>
           <li>Tuplata saa millä tahansa kahdella kortilla, myös jaon jälkeen.</li>
           <li>Parin saa jakaa, ja jakamista saa jatkaa niin kauan kuin pareja tulee ja saldo riittää.</li>
-          <li>Vakuutusta tarjotaan, kun jakajalla on ässä. Se maksaa puolet panoksesta ja voittaa 2:1.</li>
+          <li>Vakuutusta tarjotaan, kun jakajalla on ässä. Se maksaa puolet panoksesta jokaiselta kädeltä ja voittaa 2:1.</li>
           <li>Luovutus kahdella ensimmäisellä kortilla palauttaa puolet panoksesta.</li>
+          <li>Voit pelata yhdestä viiteen kättä kerralla. Jokaisella kädellä on oma panos, omat sivupanokset ja omat bonukset.</li>
           <li>Minimipanos on 100 $. Kun saldo loppuu, talo täyttää sen ilmaiseksi.</li>
         </ul>
       </section>

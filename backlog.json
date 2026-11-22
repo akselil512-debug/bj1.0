@@ -1,7 +1,7 @@
 {
   "_meta": {
     "schema_version": "1.1",
-    "generated_at": "2026-11-22T12:55:00Z",
+    "generated_at": "2026-11-22T13:10:00Z",
     "note": "Kaikki 19 storya on toteutettu ensimmäiseen testiversioon ja odottavat tuoteomistajan hyväksyntää (in_review). Koodi on repossa ja peli on julkaistu: https://akselil512-debug.github.io/bj1.0/",
     "language": "fi",
     "git_commit": "d022e40"
@@ -55,7 +55,7 @@
       "title": "Blackjackin ydinpeli",
       "description": "Amerikkalaisen blackjackin säännöt pelattavana pelirahalla.",
       "status": "in_review",
-      "stories": ["STORY-001", "STORY-002", "STORY-003", "STORY-004"]
+      "stories": ["STORY-001", "STORY-002", "STORY-003", "STORY-004", "STORY-020"]
     },
     {
       "id": "EPIC-002",
@@ -368,6 +368,23 @@
         "Pelissä on vähintään viisi erilaista tapahtumaa, esimerkiksi kerroinkierros tai ilmainen tuplaus.",
         "Tapahtuma ei koskaan keskeytä pelaajan kesken olevaa valintaa.",
         "Tapahtumien todennäköisyydet ja vaikutukset on listattu sääntönäkymässä."
+      ]
+    },
+    {
+      "id": "STORY-020",
+      "epic": "EPIC-001",
+      "title": "Monta kättä rinnakkain",
+      "as_a": "pelaaja",
+      "i_want": "pelata yhdestä viiteen kättä samalla kierroksella",
+      "so_that": "saan enemmän toimintaa ja bonusmahdollisuuksia kierrosta kohden",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Pelaaja valitsee käsien määrän (1–5) ennen jakoa ja näkee kokonaispanoksen.",
+        "Jokaisella kädellä on oma panos, omat sivupanokset ja omat erikoiskäsibonukset.",
+        "Kädet pelataan vuorotellen, ja jokainen ratkaistaan erikseen jakajaa vastaan.",
+        "Blackjack-käsi maksetaan heti, ja muut kädet jatkavat peliä.",
+        "Vakuutus kattaa kaikki kädet."
       ]
     }
   ],

@@ -383,3 +383,71 @@ describe('STORY-013/014 storage and transfer code', () => {
     }
   });
 });
+
+describe('STORY-020 several hands side by side', () => {
+  // Deal order with two hands: hand 1, hand 2, dealer up, hand 1, hand 2, dealer hole.
+  it('deals every hand its own cards and charges the bet for each', () => {
+    const r = deal([c(10), c(9, H), c(6, D), c(8, H), c(2, D), c(10, C)], { hands: 2 });
+    expect(r.hands.map((h) => h.cards.map((x) => x.r))).toEqual([[10, 8], [9, 2]]);
+    expect(r.dealer.map((x) => x.r)).toEqual([6, 10]);
+    expect(r.balance).toBe(10_000 - 200);
+    expect(r.active).toBe(0);
+  });
+
+  it('plays the hands in turn and settles each against the dealer', () => {
+    let r = deal([c(10), c(9, H), c(6, D), c(8, H), c(2, D), c(10, C), c(10, H), c(5)], { hands: 2 });
+    r = act(r, 'stand'); // hand 1 stays on 18
+    expect(r.active).toBe(1);
+    r = act(r, 'double'); // hand 2: 11 + 10 = 21
+    expect(r.phase).toBe('result'); // dealer 16 draws 5 and makes 21
+    expect(r.hands.map((h) => h.outcome)).toEqual(['lose', 'push']);
+    expect(roundNet(r)).toBe(-100);
+  });
+
+  it('pays a natural at once and lets the other hands play on', () => {
+    let r = deal([c(1, H), c(10), c(9, D), c(13, D), c(7, H), c(8, C)], { hands: 2 });
+    expect(r.phase).toBe('player');
+    expect(r.active).toBe(1); // hand 1 is a blackjack and needs no decision
+    r = act(r, 'stand'); // 17 against dealer 17
+    expect(r.hands.map((h) => h.outcome)).toEqual(['blackjack', 'push']);
+    expect(roundNet(r)).toBe(150);
+    expect(r.triggerBonusGame).toBe(true);
+  });
+
+  it('dealer blackjack beats every hand except a natural', () => {
+    const r = deal([c(1, H), c(10), c(13, C), c(13, D), c(9, H), c(1, C)], { hands: 2 });
+    expect(r.phase).toBe('result');
+    expect(r.hands.map((h) => h.outcome)).toEqual(['push', 'lose']);
+    expect(roundNet(r)).toBe(-100);
+  });
+
+  it('insurance covers all hands', () => {
+    const offered = deal([c(10), c(9, H), c(1, C), c(8, H), c(7, D), c(13, C)], { hands: 2 });
+    expect(offered.phase).toBe('insurance');
+    const r = decideInsurance(offered, true);
+    expect(r.insurance).toBe(100);
+    expect(roundNet(r)).toBe(0); // loses 200, wins 200 on the 100 insurance
+  });
+
+  it('each hand can surrender, split and earn its own bonuses', () => {
+    let r = deal([c(13, S), c(10), c(9, D), c(13, C), c(6, H), c(8, C)], { hands: 2 });
+    expect(r.bonusWins.map((w) => w.name)).toEqual(['Käsi 1: Mustat kuninkaat']);
+    expect(legalActions(r)).toContain('split');
+    r = act(r, 'stand');
+    expect(legalActions(r)).toContain('surrender'); // hand 2: 16 against 9
+    r = act(r, 'surrender');
+    expect(r.hands.map((h) => h.outcome)).toEqual(['win', 'surrender']);
+  });
+
+  it('side bets are placed and settled per hand', () => {
+    const r = deal([c(9, S), c(4, H), c(2, D), c(9, S), c(7, D), c(10, C)], { hands: 2, side: { pp: 10, t3: 0 } });
+    expect(r.sideWins.map((w) => w.name)).toEqual(['Käsi 1: Perfect Pairs: Täydellinen pari (sama maa)']);
+    expect(r.balance).toBe(10_000 - 220 + 260);
+  });
+
+  it('allows one to five hands and no more than the balance covers', () => {
+    expect(deal(newShoe(mulberry32(5)), { hands: 5 }).hands).toHaveLength(5);
+    expect(() => deal(newShoe(mulberry32(5)), { hands: 6 })).toThrow();
+    expect(() => deal(newShoe(mulberry32(5)), { hands: 3, balance: 250 })).toThrow();
+  });
+});

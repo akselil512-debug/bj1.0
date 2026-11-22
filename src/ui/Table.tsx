@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Card, cardValue, handValue } from '../game/cards';
 import {
-  act, Action, canAffordInsurance, decideInsurance, Hand, insuranceCost, legalActions, MIN_BET, Modifiers,
+  act, Action, canAffordInsurance, decideInsurance, Hand, insuranceCost, legalActions, MAX_HANDS, MIN_BET, Modifiers,
   Outcome, prepareShoe, Round, roundNet, startRound, Win,
 } from '../game/engine';
 import { ACTION_NAMES, bestAction, INSURANCE_ADVICE } from '../game/strategy';
@@ -39,6 +39,7 @@ export function Table({ profile, onUpdate, onSave, onBalance, notify }: Props) {
   const shoe = useRef<Card[] | null>(null);
   const [round, setRound] = useState<Round | null>(null);
   const [bet, setBet] = useState(500);
+  const [seats, setSeats] = useState(1);
   const [pp, setPp] = useState(false);
   const [t3, setT3] = useState(false);
   const [showPaytables, setShowPaytables] = useState(false);
@@ -52,7 +53,8 @@ export function Table({ profile, onUpdate, onSave, onBalance, notify }: Props) {
   const inPlay = round !== null && round.phase !== 'result';
   const balance = inPlay ? round.balance : profile.balance;
   const sideStake = Math.max(10, Math.round(bet / 10));
-  const totalStake = bet + (pp ? sideStake : 0) + (t3 ? sideStake : 0);
+  const perHand = bet + (pp ? sideStake : 0) + (t3 ? sideStake : 0);
+  const totalStake = perHand * seats;
   const canDeal = bet >= MIN_BET && totalStake <= profile.balance;
 
   useEffect(() => {
@@ -95,6 +97,7 @@ export function Table({ profile, onUpdate, onSave, onBalance, notify }: Props) {
       rng: Math.random,
       balance: profile.balance,
       bet,
+      hands: seats,
       side: { pp: pp ? sideStake : 0, t3: t3 ? sideStake : 0 },
       mods: mods?.mods,
     });
@@ -182,7 +185,7 @@ export function Table({ profile, onUpdate, onSave, onBalance, notify }: Props) {
       {coach && (
         <aside className="coach" aria-label="Opastus">
           {!round && (
-            <p><strong>1/3 Panos.</strong> Tavoitteesi on päästä lähemmäs lukua 21 kuin jakaja menemättä yli. Kuvakortit ovat 10, ässä on 1 tai 11. Valitse panos pelimerkeillä ja paina Jaa kortit.</p>
+            <p><strong>1/3 Panos.</strong> Tavoitteesi on päästä lähemmäs lukua 21 kuin jakaja menemättä yli. Kuvakortit ovat 10, ässä on 1 tai 11. Valitse panos pelimerkeillä ja paina Jaa kortit. Saldosi näkyy oikeassa yläkulmassa.</p>
           )}
           {round && round.phase !== 'result' && (
             <p><strong>2/3 Siirrot.</strong> Ota kortti lisää tai jää tähän. Tuplaus kaksinkertaistaa panoksen ja antaa yhden kortin. Parin voi jakaa kahdeksi kädeksi. Luovutus pelastaa puolet panoksesta. Tähti näyttää parhaan siirron.</p>
@@ -194,7 +197,7 @@ export function Table({ profile, onUpdate, onSave, onBalance, notify }: Props) {
         </aside>
       )}
 
-      <section className="felt" aria-label="Pelipöytä">
+      <section className={round ? 'felt' : 'felt idle'} aria-label="Pelipöytä">
         <div className="seat">
           <h2 className="seat-title">
             Jakaja
@@ -226,7 +229,7 @@ export function Table({ profile, onUpdate, onSave, onBalance, notify }: Props) {
       {!round && (
         <section className="controls" aria-label="Panostus">
           <div className="bet-row">
-            <span className="bet-label">Panos</span>
+            <span className="bet-label">Panos / käsi</span>
             <span className="bet-value">{money(bet)}</span>
             <button className="btn ghost small" aria-expanded={showPaytables} aria-label="Sivupanosten kertoimet" onClick={() => setShowPaytables(!showPaytables)}>
               Kertoimet
@@ -235,10 +238,17 @@ export function Table({ profile, onUpdate, onSave, onBalance, notify }: Props) {
           </div>
           <div className="chips">
             {CHIPS.map((chip) => (
-              <button key={chip} className="chip" disabled={bet + chip > profile.balance} onClick={() => setBet(bet + chip)} aria-label={`+${chip >= 1000 ? `${chip / 1000}k` : chip}, lisää panokseen ${money(chip)}`}>
+              <button key={chip} className="chip" disabled={(perHand + chip) * seats > profile.balance} onClick={() => setBet(bet + chip)} aria-label={`+${chip >= 1000 ? `${chip / 1000}k` : chip}, lisää panokseen ${money(chip)}`}>
                 +{chip >= 1000 ? `${chip / 1000}k` : chip}
               </button>
             ))}
+          </div>
+          <div className="seats-row">
+            <span className="bet-label" id="seats-label">Käsiä</span>
+            <button className="btn small step" aria-label="Vähemmän käsiä" disabled={seats <= 1} onClick={() => setSeats(seats - 1)}>−</button>
+            <output className="seats-value" aria-labelledby="seats-label">{seats}</output>
+            <button className="btn small step" aria-label="Enemmän käsiä" disabled={seats >= MAX_HANDS} onClick={() => setSeats(seats + 1)}>+</button>
+            <span className="stake-total">Yhteensä <b>{money(totalStake)}</b></span>
           </div>
           <div className="sides">
             <label className="check">
@@ -312,7 +322,9 @@ export function Table({ profile, onUpdate, onSave, onBalance, notify }: Props) {
           {decisions.length > 0 && (
             <p className="feedback">
               {wrong.length === 0
-                ? `Kaikki ${decisions.length} siirtoasi olivat perusstrategian mukaisia.`
+                ? decisions.length === 1
+                  ? 'Siirtosi oli perusstrategian mukainen.'
+                  : `Kaikki ${decisions.length} siirtoasi olivat perusstrategian mukaisia.`
                 : `${decisions.length - wrong.length}/${decisions.length} siirtoa oikein. Valitsit: ${wrong[0].chosen}. Paras siirto olisi ollut: ${wrong[0].best}.`}
             </p>
           )}

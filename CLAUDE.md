@@ -143,6 +143,7 @@ Perussäännöt (amerikkalainen blackjack):
 - Split: parin saa jakaa, ja jakamista saa jatkaa rajattomasti
 - Vakuutus, kun jakajalla on ässä
 - Luovutus palauttaa puolet panoksesta
+- Kierroksella voi pelata 1–5 kättä rinnakkain
 
 Bonukset (käyttäjän päätökset):
 
@@ -168,6 +169,8 @@ Päätökset:
 | 2026-11-22 | Mustien kuninkaiden bonus laukeaa pelaajan kahdesta ensimmäisestä kortista ja maksetaan pääpanoksesta. |
 | 2026-11-22 | Ensimmäinen versio testataan yksityisellä testilinkillä. Koodi viedään GitHubiin vasta hyväksynnän jälkeen. |
 | 2026-11-22 | Jaetut ässät saavat ottaa lisäkortteja (Docin valinta, vahvistettava). Sivupanos on kymmenesosa pääpanoksesta. |
+| 2026-11-22 | Pelaaja voi pelata 1–5 kättä rinnakkain (STORY-020). Panos, sivupanokset ja bonukset ovat käsikohtaisia, vakuutus kattaa kaikki kädet. |
+| 2026-11-22 | Ilmoitukset näytetään yksi kerrallaan, jotta ne eivät peitä pöytää. Vitsirivi (JOKERI) jätetään vastauksista pois, koska roolileikki ärsytti käyttäjää. |
 
 Tilanne 2026-11-22: ensimmäinen versio on rakennettu (49 yksikkötestiä ja 5 selaintestiä läpi, mukana axe-saavutettavuustarkistus WCAG 2.1 AA -säännöillä jokaisella sivulla). Storyt ovat tilassa `in_review`. Simulaation tulos on tiedostossa `docs/simulation.md`: koko peli tapahtumineen on pelaajalle noin +434 % panoksesta kierrosta kohden.
 

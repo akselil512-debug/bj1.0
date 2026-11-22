@@ -48,7 +48,7 @@ button, input, textarea { font: inherit; }
 .brand-sub { font-size: 0.85rem; opacity: 0.9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .balance { text-align: right; flex-shrink: 0; }
 .balance-label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
-.balance-value { font-family: var(--display); font-size: 1.25rem; color: var(--gold); font-variant-numeric: tabular-nums; }
+.balance-value { font-family: var(--display); font-size: 1.45rem; color: var(--gold); font-variant-numeric: tabular-nums; }
 .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
 .tab {
   min-height: 44px; border: 2px solid var(--wood-line); background: var(--wood-light); color: var(--paper);
@@ -80,6 +80,7 @@ button, input, textarea { font: inherit; }
   border: 4px solid var(--gold-deep); border-radius: 18px; padding: 12px 10px; flex: 1;
   display: flex; flex-direction: column; justify-content: space-between; gap: 6px; min-height: 240px;
 }
+.felt.idle { --cw: 40px; min-height: 0; flex: 0 1 auto; }
 .felt-rule { text-align: center; font-family: var(--display); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: oklch(0.9 0.08 120); }
 .seat { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .seat-title { font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
@@ -114,8 +115,13 @@ button, input, textarea { font: inherit; }
 
 .controls { background: var(--wood-light); border: 2px solid var(--wood-line); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
 .bet-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.bet-label { text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.08em; }
-.bet-value { font-family: var(--display); font-size: 1.5rem; color: var(--gold); flex: 1; font-variant-numeric: tabular-nums; }
+.bet-label { text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.06em; white-space: nowrap; }
+.bet-value { font-family: var(--display); font-size: 1.5rem; color: var(--gold); flex: 1; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.seats-row { display: flex; align-items: center; gap: 8px; }
+.step { min-width: 48px; font-size: 1.3rem; padding: 0; }
+.seats-value { font-family: var(--display); font-size: 1.4rem; color: var(--gold); min-width: 1.5ch; text-align: center; }
+.stake-total { margin-left: auto; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+.stake-total b { color: var(--gold); }
 .chips { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 .chip {
   height: 52px; min-width: 44px; border-radius: 26px; border: 4px dashed var(--paper);
@@ -218,7 +224,8 @@ td:last-child, th:last-child { text-align: right; white-space: nowrap; font-weig
 .bonus-result b { display: block; font-family: var(--display); font-size: 1.8rem; color: var(--win); }
 
 .toasts { position: fixed; top: max(10px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); width: min(92vw, 440px); display: flex; flex-direction: column; gap: 6px; z-index: 20; pointer-events: none; }
-.toast { background: var(--paper); color: var(--ink); border-left: 6px solid var(--gold-deep); border-radius: 10px; padding: 8px 12px; box-shadow: 0 4px 14px oklch(0 0 0 / 0.5); display: flex; flex-direction: column; font-size: 0.9rem; animation: pop 0.25s ease-out; }
+.toast { background: var(--paper); color: var(--ink); border-left: 6px solid var(--gold-deep); border-radius: 10px; padding: 5px 12px; box-shadow: 0 4px 14px oklch(0 0 0 / 0.5); display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; font-size: 0.85rem; line-height: 1.3; animation: pop 0.25s ease-out; }
+.toast-more { margin-left: auto; font-weight: 700; }
 
 .calm *, .calm *::before { animation: none !important; transition: none !important; }
 @media (prefers-reduced-motion: reduce) {
