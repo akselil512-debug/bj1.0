@@ -178,7 +178,7 @@ Avoimet kysymykset:
 3. **Pelitalouden tasapaino.** Kuudella pakalla kaksi mustaa kuningasta tulee noin kerran 735 kädessä, joten 1000 × panos tekee pelistä pelaajalle vahvasti voitollisen. Pelirahalla tämä on sallittu valinta, mutta tasot ja achievementit eivät voi perustua pelkkään saldoon. Ratkaistaan STORY-010:ssä.
 4. **Kertoimien lukitus.** Erikoiskäsien, tapahtumien ja bonuspelien kertoimet ovat Docin ehdotuksia (paitsi mustat kuninkaat). Tuoteomistaja käy simulaation läpi ennen lukitusta.
 8. **Perusstrategiataulukko: ratkaistu 2026-11-22.** Taulukko on verrattu Wizard of Odds -lähteeseen solu kerrallaan testissä `tests/strategy-chart.test.ts` (330 solua täsmää).
-10. **Julkaisu GitHubiin.** Koodi on valmiina paikallisena commitina, mutta vienti vaatii, että käyttäjä yhdistää GitHub-tilinsä Claudeen. GitHub Pagesin lähteeksi asetetaan "GitHub Actions".
+10. **Julkaisu GitHubiin: ratkaistu 2026-11-22.** Koodi on repossa (`main`, ensimmäinen commit `d022e40`), GitHub Actions ajoi testit ja julkaisi pelin osoitteeseen https://akselil512-debug.github.io/bj1.0/. Pagesin lähde on "GitHub Actions". Clauden GitHub-sovellus on asennettu repoon, joten vienti toimii jatkossa suoraan.
 11. **Kolmen pelaajan testi.** Jokaisella pelaajalla on oma profiili omassa selaimessaan. Yhteistä tulostaulua ei ole (ks. kohta 2).
 9. **Kesken jäänyt kierros.** Jos sivu ladataan uudelleen kesken käden, panos palautuu. Pelirahalla hyväksyttävä, oikealla rahalla ei.
 5. **Lopullinen nimi.** "Saloon 21" on työnimi.
