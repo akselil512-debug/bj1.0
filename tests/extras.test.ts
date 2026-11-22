@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { mulberry32 } from '../src/game/cards';
-import { BetKey, colorOf, OUTSIDE_BETS, pays, POCKETS, RED_NUMBERS, settle, spinNumber, straight, totalStake, wins } from '../src/game/roulette';
+import { BetKey, colorOf, OUTSIDE_BETS, pays, POCKETS, RED_NUMBERS, settle, spinNumber, straight, totalStake, WHEEL_ORDER, wins } from '../src/game/roulette';
 import { canSpin, dayKey, emptyDaily, spinWheel, STREAK_BONUS, streakDay, WHEEL_PRIZES } from '../src/game/daily';
 import { applyDaily, applyRoulette, newProfile, START_BALANCE } from '../src/game/progress';
 import { exportCode, importCode } from '../src/game/storage';
@@ -11,6 +11,14 @@ describe('STORY-021 roulette', () => {
     for (let n = 0; n < POCKETS; n++) counts[colorOf(n)]++;
     expect(counts).toEqual({ red: 18, black: 18, green: 1 });
     expect(RED_NUMBERS.has(17)).toBe(false);
+  });
+
+  it('the wheel shows every number once, with red and black alternating around it', () => {
+    expect(WHEEL_ORDER).toHaveLength(POCKETS);
+    expect([...WHEEL_ORDER].sort((a, b) => a - b)).toEqual(Array.from({ length: POCKETS }, (_, n) => n));
+    expect(WHEEL_ORDER[0]).toBe(0);
+    for (let i = 1; i < POCKETS - 1; i++) expect(colorOf(WHEEL_ORDER[i]), `pocket ${i}`).not.toBe(colorOf(WHEEL_ORDER[i + 1]));
+    expect(colorOf(WHEEL_ORDER[1])).toBe('red');
   });
 
   it('every bet has the same expected value of -1/37', () => {

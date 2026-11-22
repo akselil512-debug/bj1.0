@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { applyRoulette, Profile, Update } from '../game/progress';
 import {
-  BetKey, Bets, COLOR_LABELS, colorOf, OUTSIDE_LABELS, OutsideBet, settle, SpinResult, spinNumber, straight, totalStake,
+  BetKey, Bets, COLOR_LABELS, colorOf, OUTSIDE_LABELS, OutsideBet, POCKETS, settle, SpinResult, spinNumber, straight, totalStake, WHEEL_ORDER,
 } from '../game/roulette';
 import { money } from './common';
 
@@ -9,7 +9,19 @@ const ROWS = [0, 1, 2].map((row) => Array.from({ length: 12 }, (_, col) => col *
 const DOZENS: OutsideBet[] = ['d1', 'd2', 'd3'];
 const EVEN_MONEY: OutsideBet[] = ['low', 'even', 'red', 'black', 'odd', 'high'];
 const CHIPS = [100, 500, 1000, 5000];
-const SPIN_MS = 2600;
+const SPIN_MS = 3600;
+const STEP = 360 / POCKETS;
+const POCKET_FILL = { red: 'oklch(0.5 0.19 27)', black: 'oklch(0.16 0.02 60)', green: 'oklch(0.4 0.12 150)' };
+
+/** A ring segment of the wheel, centred on the top and `STEP` degrees wide. */
+const WEDGE = (() => {
+  const point = (r: number, deg: number) => {
+    const rad = ((deg - 90) * Math.PI) / 180;
+    return `${(r * Math.cos(rad)).toFixed(2)} ${(r * Math.sin(rad)).toFixed(2)}`;
+  };
+  const half = STEP / 2;
+  return `M ${point(96, -half)} A 96 96 0 0 1 ${point(96, half)} L ${point(64, half)} A 64 64 0 0 0 ${point(64, -half)} Z`;
+})();
 
 const short = (v: number) => (v >= 1000 ? `${String(v / 1000).replace('.', ',')}k` : `${v}`);
 const prefersStill = () => typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -18,7 +30,7 @@ export function Roulette({ profile, onUpdate }: { profile: Profile; onUpdate: (u
   const [bets, setBets] = useState<Bets>({});
   const [chip, setChip] = useState(500);
   const [spinning, setSpinning] = useState(false);
-  const [turns, setTurns] = useState(0);
+  const [rot, setRot] = useState(0);
   const [result, setResult] = useState<SpinResult | null>(null);
   const [history, setHistory] = useState<number[]>([]);
   const [message, setMessage] = useState('');
@@ -44,7 +56,8 @@ export function Roulette({ profile, onUpdate }: { profile: Profile; onUpdate: (u
     const outcome = settle(bets, spinNumber(Math.random));
     setSpinning(true);
     setResult(null);
-    setTurns((t) => t + 4);
+    // Four full turns, then stop with the winning pocket under the ball at the top.
+    setRot((r) => Math.ceil(r / 360) * 360 + 1440 - WHEEL_ORDER.indexOf(outcome.number) * STEP);
     timer.current = setTimeout(
       () => {
         onUpdate(applyRoulette(latest.current, outcome, Date.now()));
@@ -69,8 +82,17 @@ export function Roulette({ profile, onUpdate }: { profile: Profile; onUpdate: (u
     <div className="table roulette">
       <section className="felt wheel-area" aria-label="Rulettipyörä">
         <div className="r-wheel" aria-hidden="true">
-          <div className="r-pockets" style={{ transform: `rotate(${turns * 360 + (result ? result.number * 9.73 : 0)}deg)`, transitionDuration: still ? '0s' : `${SPIN_MS}ms` }} />
-          <div className="r-bowl" />
+          <svg className="r-pockets" viewBox="-100 -100 200 200" style={{ transform: `rotate(${rot}deg)`, transitionDuration: still ? '0s' : `${SPIN_MS}ms` }}>
+            {WHEEL_ORDER.map((n, i) => (
+              <g key={n} transform={`rotate(${(i * STEP).toFixed(3)})`}>
+                <path d={WEDGE} fill={POCKET_FILL[colorOf(n)]} stroke="oklch(0.82 0.14 85)" strokeWidth="0.6" />
+                <text y="-77" textAnchor="middle" fontSize="10.5" fontWeight="700" fill="white">{n}</text>
+              </g>
+            ))}
+            <circle r="64" fill="oklch(0.24 0.04 55)" stroke="oklch(0.68 0.14 75)" strokeWidth="2" />
+            <path d="M0 -60 V60 M-60 0 H60 M-42 -42 L42 42 M42 -42 L-42 42" stroke="oklch(0.68 0.14 75)" strokeWidth="1.5" />
+          </svg>
+          <div className="r-ball" />
           <div className={`r-hub ${result ? colorOf(result.number) : ''}`}>{result ? result.number : spinning ? '' : '?'}</div>
         </div>
         <div className="r-info" aria-live="polite">

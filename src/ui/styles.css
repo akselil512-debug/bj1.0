@@ -366,3 +366,13 @@ td:last-child, th:last-child { text-align: right; white-space: nowrap; font-weig
 .streak li.current .streak-dot { border: 3px solid var(--gold); box-shadow: 0 0 0 3px oklch(0.82 0.14 85 / 0.3); }
 .streak li.current .streak-day { color: var(--gold); font-weight: 700; }
 .streak-bonus { font-weight: 600; }
+
+/* Roulette wheel with every number on its pocket */
+.wheel-area { flex-direction: column; gap: 10px; }
+.r-wheel { width: min(280px, 74vw); height: min(280px, 74vw); }
+.r-pockets { position: absolute; inset: 9px; width: auto; height: auto; border-radius: 50%; background: none; transition: transform cubic-bezier(0.12, 0.72, 0.1, 1); }
+svg.r-pockets { width: calc(100% - 18px); height: calc(100% - 18px); }
+.r-ball { position: absolute; left: 50%; top: 22.5%; width: 13px; height: 13px; margin-left: -6.5px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, oklch(1 0 0), oklch(0.76 0 0)); box-shadow: 0 1px 3px oklch(0 0 0 / 0.7); }
+.r-hub { inset: 37%; font-size: 1.9rem; }
+.r-info { align-items: center; text-align: center; flex: 0 0 auto; }
+.r-info .result-line { text-align: center; }
