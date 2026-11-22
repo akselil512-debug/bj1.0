@@ -1,0 +1,391 @@
+{
+  "_meta": {
+    "schema_version": "1.1",
+    "generated_at": "2026-11-22T12:15:00Z",
+    "note": "Kaikki 19 storya on toteutettu ensimmäiseen testiversioon ja odottavat tuoteomistajan hyväksyntää (in_review). Koodia ei ole vielä viety repoon.",
+    "language": "fi",
+    "git_commit": null
+  },
+  "project": {
+    "name": "Saloon 21",
+    "description": "Villin lännen teemainen selainblackjack, joka opettaa pelaamaan, palkitsee kehittymisestä achievementeilla ja maustaa peliä bonuksilla, pop-upeilla ja bonuspeleillä.",
+    "repository": "https://github.com/akselil512-debug/bj1.0.git",
+    "people": [
+      { "name": "mr 27. fiskespö", "role": "Tuoteomistaja ja pelisuunnittelija" }
+    ],
+    "organisation": null,
+    "client": null,
+    "address_as": "sinuttelu",
+    "conversation_language": "fi",
+    "code_language": "en",
+    "license": {
+      "id": "MIT",
+      "note": "Koodi on avointa ja tekijä mainitaan. Mukaan ei oteta kirjastoja, joiden lisenssi ei sovi yhteen MIT:n kanssa.",
+      "assets": "Grafiikat ja äänet tehdään itse tai AI:lla. Fontit ja valmiit äänet vain CC0- tai OFL-lisenssillä. Lähteet kirjataan tiedostoon ASSETS-LICENSES.md.",
+      "deliverables_owner": "mr 27. fiskespö"
+    },
+    "scalability": {
+      "size_class": "small",
+      "users": "noin 10 ensimmäisenä kuukautena, alle 100",
+      "data_volume": "muutama kilotavu pelaajaa kohden selaimen localStoragessa",
+      "availability": "GitHub Pagesin oma taso, ei takuita",
+      "performance_target": "lataus puhelimella alle 3 sekunnissa, napit reagoivat viiveettä",
+      "outlook_12m": "Jos pelaajia tulee satoja tai oikea raha otetaan mukaan, siirrytään palvelimeen ja tietokantaan."
+    },
+    "security": {
+      "personal_data": false,
+      "data_classification": "Julkinen. Nimimerkki ja edistyminen vain pelaajan omalla laitteella.",
+      "authentication": "Ei varsinaista kirjautumista. Nimimerkki ja 3-numeroinen koodi profiilin mukavuuslukkona.",
+      "roles": ["pelaaja"],
+      "secrets": "Ei tällä hetkellä. Tarvittaessa GitHub Actionsin salaisuudet ja ympäristömuuttujat, .env ei versionhallintaan.",
+      "compliance": [],
+      "dependency_scanning": "Dependabot ja npm audit CI:ssä"
+    },
+    "testing": {
+      "levels": ["unit", "e2e", "manual_acceptance"],
+      "tools": ["Vitest", "Playwright"],
+      "ci": "GitHub Actions, punainen testi estää mergen ja julkaisun",
+      "coverage_target": null,
+      "acceptance_by": "mr 27. fiskespö"
+    }
+  },
+  "epics": [
+    {
+      "id": "EPIC-001",
+      "title": "Blackjackin ydinpeli",
+      "description": "Amerikkalaisen blackjackin säännöt pelattavana pelirahalla.",
+      "status": "in_review",
+      "stories": ["STORY-001", "STORY-002", "STORY-003", "STORY-004"]
+    },
+    {
+      "id": "EPIC-002",
+      "title": "Opettava peli",
+      "description": "Peli opastaa säännöt ja neuvoo parhaan siirron perusstrategian mukaan.",
+      "status": "in_review",
+      "stories": ["STORY-005", "STORY-006", "STORY-007"]
+    },
+    {
+      "id": "EPIC-003",
+      "title": "Bonukset",
+      "description": "Sivupanokset, erikoiskädet, pop-up-tapahtumat ja sisäkkäiset bonuspelit.",
+      "status": "in_review",
+      "stories": ["STORY-008", "STORY-009", "STORY-010", "STORY-018", "STORY-019"]
+    },
+    {
+      "id": "EPIC-004",
+      "title": "Kehittyminen ja profiili",
+      "description": "Tasot, achievementit, profiili ja edistymisen siirto laitteelta toiselle.",
+      "status": "in_review",
+      "stories": ["STORY-011", "STORY-012", "STORY-013", "STORY-014"]
+    },
+    {
+      "id": "EPIC-005",
+      "title": "Ulkoasu ja julkaisu",
+      "description": "Villin lännen käyttöliittymä puhelimelle, saavutettavuus ja automaattinen julkaisu.",
+      "status": "in_review",
+      "stories": ["STORY-015", "STORY-016", "STORY-017"]
+    }
+  ],
+  "stories": [
+    {
+      "id": "STORY-001",
+      "epic": "EPIC-001",
+      "title": "Peruskierros",
+      "as_a": "pelaaja",
+      "i_want": "pelata kierroksen (panos, jako, hit, stand)",
+      "so_that": "voin yrittää voittaa jakajan",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Peli käyttää kuutta pakkaa.",
+        "Blackjack maksaa 3:2.",
+        "Tasapeli palauttaa panoksen.",
+        "Jakaja ottaa kortin 16:een asti ja jää 17:ään.",
+        "Jakaja tarkistaa piilokortistaan blackjackin ennen pelaajan siirtoja."
+      ]
+    },
+    {
+      "id": "STORY-002",
+      "epic": "EPIC-001",
+      "title": "Tuplaus ja rajaton split",
+      "as_a": "pelaaja",
+      "i_want": "tuplata ja jakaa parin niin monta kertaa kuin pareja tulee",
+      "so_that": "voin hyödyntää hyvät kädet",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Tuplaus onnistuu millä tahansa kahdella kortilla ja myös splitin jälkeen.",
+        "Splitin kädet pelataan erikseen omilla panoksillaan.",
+        "Uuden parin saa jakaa aina uudelleen ilman ylärajaa, kunhan saldo riittää.",
+        "Käyttöliittymä näyttää kaikki kädet luettavasti myös puhelimella, kun käsiä on monta."
+      ]
+    },
+    {
+      "id": "STORY-003",
+      "epic": "EPIC-001",
+      "title": "Vakuutus ja luovutus",
+      "as_a": "pelaaja",
+      "i_want": "vakuutuksen ja luovutuksen",
+      "so_that": "käytössäni ovat kaikki amerikkalaiset siirrot",
+      "effort": "S",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Vakuutusta tarjotaan, kun jakajan näkyvä kortti on ässä.",
+        "Luovutus palauttaa puolet panoksesta ja päättää käden."
+      ]
+    },
+    {
+      "id": "STORY-004",
+      "epic": "EPIC-001",
+      "title": "Pelirahasaldo",
+      "as_a": "pelaaja",
+      "i_want": "pelirahasaldon",
+      "so_that": "voin panostaa ilman oikeaa rahaa",
+      "effort": "S",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Uusi pelaaja saa aloitussaldon (määrä päätetään, ks. CLAUDE.md osio 13).",
+        "Tyhjä saldo täyttyy uudelleen ilman maksua.",
+        "Pelissä ei ole oikean rahan ostoja eikä nostoja."
+      ]
+    },
+    {
+      "id": "STORY-005",
+      "epic": "EPIC-002",
+      "title": "Ohjattu ensimmäinen kierros",
+      "as_a": "aloittelija",
+      "i_want": "ohjatun ensimmäisen kierroksen",
+      "so_that": "opin säännöt pelaamalla",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Opastus käy läpi panoksen, siirrot ja voitonmaksun.",
+        "Opastuksen voi ohittaa ja avata myöhemmin uudelleen."
+      ]
+    },
+    {
+      "id": "STORY-006",
+      "epic": "EPIC-002",
+      "title": "Paras siirto joka kädessä",
+      "as_a": "pelaaja",
+      "i_want": "nähdä parhaan siirron joka kädessä",
+      "so_that": "opin perusstrategian",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Neuvo vastaa pelin säännöille laskettua perusstrategiataulukkoa, jonka lähde on kirjattu repoon.",
+        "Neuvon yhteydessä on lyhyt perustelu.",
+        "Neuvot voi kytkeä pois asetuksista."
+      ]
+    },
+    {
+      "id": "STORY-007",
+      "epic": "EPIC-002",
+      "title": "Palaute käden jälkeen",
+      "as_a": "pelaaja",
+      "i_want": "palautteen käden jälkeen",
+      "so_that": "näen kehittyväni",
+      "effort": "S",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Peli kertoo, oliko siirto perusstrategian mukainen.",
+        "Oikeiden siirtojen osuus näkyy profiilissa."
+      ]
+    },
+    {
+      "id": "STORY-008",
+      "epic": "EPIC-003",
+      "title": "Sivupanokset",
+      "as_a": "pelaaja",
+      "i_want": "sivupanokset (Perfect Pairs ja 21+3)",
+      "so_that": "peliin tulee lisää jännitystä",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Sivupanos asetetaan ennen jakoa ja ratkeaa ensimmäisistä korteista.",
+        "Kertoimet näkyvät pelaajalle ennen panostusta."
+      ]
+    },
+    {
+      "id": "STORY-009",
+      "epic": "EPIC-003",
+      "title": "Villin lännen erikoiskädet",
+      "as_a": "pelaaja",
+      "i_want": "erikoisbonuksia tietyistä korttiyhdistelmistä",
+      "so_that": "peli tuntuu omaleimaiselta ja villiltä",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Kaksi mustaa kuningasta pelaajan aloituskätenä maksaa 1000 × panos.",
+        "Mukana on vähintään neljä muuta erikoiskättä, esimerkiksi ässät ja kasit, kolme seiskaa ja samaa maata oleva blackjack.",
+        "Jokainen bonus näytetään omalla animaatiollaan ja listataan sääntönäkymässä kertoimineen."
+      ]
+    },
+    {
+      "id": "STORY-010",
+      "epic": "EPIC-003",
+      "title": "Bonusten simulaatio",
+      "as_a": "ylläpitäjä",
+      "i_want": "simulaation bonusten kertoimista",
+      "so_that": "tiedän pelitalouden tasapainon ennen julkaisua",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Simulaatio laskee pelaajan odotusarvon jokaiselle bonukselle ja koko pelille.",
+        "Kertoimet ja laskennan tulos kirjataan repoon.",
+        "Tulos käydään läpi tuoteomistajan kanssa ennen kuin kertoimet lukitaan."
+      ]
+    },
+    {
+      "id": "STORY-011",
+      "epic": "EPIC-004",
+      "title": "Tasot ja arvonimet",
+      "as_a": "pelaaja",
+      "i_want": "tasoja ja arvonimiä",
+      "so_that": "pelaamisella on tavoite",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Kokemusta kertyy pelatuista käsistä ja oikeista siirroista, ei pelkästä saldosta.",
+        "Arvonimi nousee tasojen mukana, esimerkiksi keltanokasta sheriffiksi."
+      ]
+    },
+    {
+      "id": "STORY-012",
+      "epic": "EPIC-004",
+      "title": "Achievementit",
+      "as_a": "pelaaja",
+      "i_want": "achievementteja",
+      "so_that": "saavutukseni jäävät näkyviin",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Pelissä on vähintään 15 achievementtia.",
+        "Avautuminen ilmoitetaan pelin aikana, ja kaikki näkyvät profiilissa."
+      ]
+    },
+    {
+      "id": "STORY-013",
+      "epic": "EPIC-004",
+      "title": "Profiili ja koodilukko",
+      "as_a": "pelaaja",
+      "i_want": "profiilin nimimerkillä ja 3-numeroisella koodilla",
+      "so_that": "edistymiseni säilyy laitteella",
+      "effort": "S",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Edistyminen säilyy, kun selain suljetaan ja avataan.",
+        "Profiili aukeaa vain oikealla koodilla.",
+        "Profiilissa näkyvät omat ennätykset.",
+        "Peli kehottaa käyttämään nimimerkkiä, ei omaa nimeä."
+      ]
+    },
+    {
+      "id": "STORY-014",
+      "epic": "EPIC-004",
+      "title": "Siirtokoodi",
+      "as_a": "pelaaja",
+      "i_want": "siirtokoodin",
+      "so_that": "voin jatkaa toisella laitteella",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Peli luo koodin, joka sisältää koko edistymisen.",
+        "Koodin syöttäminen toisella laitteella palauttaa saman tilanteen.",
+        "Virheellinen koodi hylätään selkeällä viestillä eikä riko olemassa olevaa profiilia."
+      ]
+    },
+    {
+      "id": "STORY-015",
+      "epic": "EPIC-005",
+      "title": "Saluunan pelipöytä puhelimella",
+      "as_a": "pelaaja",
+      "i_want": "saluunahenkisen pelipöydän puhelimella",
+      "so_that": "peli tuntuu villiltä länneltä",
+      "effort": "L",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Peli toimii iPhonen Safarissa pystyasennossa.",
+        "Kaikki painikkeet ovat vähintään 44 pikseliä.",
+        "Ulkoasu noudattaa design-brief.md:n design-systeemiä."
+      ]
+    },
+    {
+      "id": "STORY-016",
+      "epic": "EPIC-005",
+      "title": "Saavutettavuus",
+      "as_a": "pelaaja",
+      "i_want": "saavutettavan pelin",
+      "so_that": "voin pelata apuvälineillä",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Peli täyttää WCAG 2.1 AA -tason.",
+        "Peliä voi pelata näppäimistöllä ja ruudunlukijalla.",
+        "Animaatiot ja pop-upit vähenevät, kun laite pyytää vähennettyä liikettä (prefers-reduced-motion)."
+      ]
+    },
+    {
+      "id": "STORY-017",
+      "epic": "EPIC-005",
+      "title": "Automaattinen julkaisu",
+      "as_a": "ylläpitäjä",
+      "i_want": "automaattisen julkaisun",
+      "so_that": "uusi versio päätyy pelaajille ilman käsityötä",
+      "effort": "S",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "GitHub Actions ajaa testit jokaisesta muutoksesta.",
+        "main-haaran hyväksytty muutos julkaistaan GitHub Pagesiin.",
+        "Punainen testi estää julkaisun."
+      ]
+    },
+    {
+      "id": "STORY-018",
+      "epic": "EPIC-003",
+      "title": "Bonuspeli ja bonuspelin bonuspeli",
+      "as_a": "pelaaja",
+      "i_want": "bonuspelin, jonka sisältä voi aueta vielä toinen bonuspeli",
+      "so_that": "voin yllättäen voittaa moninkertaisesti",
+      "effort": "L",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Bonuspeli laukeaa määritellystä ehdosta kesken blackjackin ja palaa sen jälkeen samaan pelitilanteeseen.",
+        "Bonuspelin sisältä voi aueta toinen bonuspeli, jonka päävoitto on 1000 × blackjack-voitto.",
+        "Laukeamisehdot ja kertoimet on todennettu STORY-010:n simulaatiolla."
+      ]
+    },
+    {
+      "id": "STORY-019",
+      "epic": "EPIC-003",
+      "title": "Satunnaiset pop-up-tapahtumat",
+      "as_a": "pelaaja",
+      "i_want": "yllättäviä pop-up-tapahtumia kesken pelin",
+      "so_that": "jokainen kierros voi tuoda jotain uutta",
+      "effort": "M",
+      "status": "in_review",
+      "acceptance_criteria": [
+        "Pelissä on vähintään viisi erilaista tapahtumaa, esimerkiksi kerroinkierros tai ilmainen tuplaus.",
+        "Tapahtuma ei koskaan keskeytä pelaajan kesken olevaa valintaa.",
+        "Tapahtumien todennäköisyydet ja vaikutukset on listattu sääntönäkymässä."
+      ]
+    }
+  ],
+  "test_tickets": [
+    {
+      "id": "TEST-001",
+      "story": "STORY-001",
+      "title": "Peruskierroksen hyväksymistestit",
+      "status": "in_progress",
+      "accepted_by": null,
+      "checks": [
+        { "criterion": "Peli käyttää kuutta pakkaa.", "type": "unit", "result": "pass" },
+        { "criterion": "Blackjack maksaa 3:2.", "type": "unit", "result": "pass" },
+        { "criterion": "Tasapeli palauttaa panoksen.", "type": "unit", "result": "pass" },
+        { "criterion": "Jakaja ottaa kortin 16:een asti ja jää 17:ään.", "type": "unit", "result": "pass" },
+        { "criterion": "Jakaja tarkistaa piilokortistaan blackjackin ennen pelaajan siirtoja.", "type": "unit", "result": "pass" },
+        { "criterion": "Kokonainen kierros pelattavissa iPhonen Safarissa.", "type": "manual", "result": "not_run" }
+      ]
+    }
+  ]
+}

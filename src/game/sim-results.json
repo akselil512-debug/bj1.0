@@ -1,0 +1,54 @@
+{
+  "generatedAt": "2026-11-22T11:58:49.158Z",
+  "rounds": 3000000,
+  "bet": 100,
+  "baseGame": -0.0005143333333333333,
+  "specials": [
+    {
+      "id": "black-kings",
+      "name": "Mustat kuninkaat",
+      "multiplier": 1000,
+      "frequency": 0.0013676666666666668,
+      "ev": 1.3676666666666666
+    },
+    {
+      "id": "lucky-sevens",
+      "name": "Kolme seiskaa",
+      "multiplier": 77,
+      "frequency": 0.00020366666666666667,
+      "ev": 0.015682333333333333
+    },
+    {
+      "id": "dead-mans-hand",
+      "name": "Kuolleen miehen käsi",
+      "multiplier": 25,
+      "frequency": 0.002949666666666667,
+      "ev": 0.07374166666666666
+    },
+    {
+      "id": "saloon-queens",
+      "name": "Saluunan kuningattaret",
+      "multiplier": 10,
+      "frequency": 0.00133,
+      "ev": 0.0133
+    },
+    {
+      "id": "suited-blackjack",
+      "name": "Maablackjack",
+      "multiplier": 2,
+      "frequency": 0.011858333333333334,
+      "ev": 0.023716666666666667
+    }
+  ],
+  "specialsTotal": 1.4941073333333332,
+  "perfectPairs": -0.06181766666666667,
+  "twentyOnePlusThree": -0.044776666666666666,
+  "bonusGame": {
+    "frequency": 0.045321,
+    "expectedMultiplier": 30.7,
+    "ev": 1.379152,
+    "jackpotFrequency": 0.0007466666666666666
+  },
+  "withoutEvents": 2.872745,
+  "withEvents": 4.335630833333333
+}
