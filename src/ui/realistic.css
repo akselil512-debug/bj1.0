@@ -109,3 +109,4 @@
 .bottom-nav { margin-top: 6px; }
 .r-wheel { overflow: hidden; }
 .main { overflow-x: clip; }
+.wheel-area { scroll-margin-top: 8px; }

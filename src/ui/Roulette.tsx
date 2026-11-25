@@ -45,6 +45,7 @@ export function Roulette({ profile, onUpdate }: { profile: Profile; onUpdate: (u
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const dropTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const wheelArea = useRef<HTMLElement>(null);
 
   useEffect(() => () => { clearTimeout(timer.current); clearTimeout(dropTimer.current); }, []);
 
@@ -64,6 +65,8 @@ export function Roulette({ profile, onUpdate }: { profile: Profile; onUpdate: (u
     const outcome = settle(bets, spinNumber(Math.random));
     setSpinning(true);
     setResult(null);
+    // The spin button sits below the wheel on a phone, so bring the wheel back into view.
+    wheelArea.current?.scrollIntoView({ block: 'start', behavior: still ? 'auto' : 'smooth' });
     // The wheel turns clockwise and the ball runs the other way, then drops into the winning pocket.
     const wheelTo = Math.ceil(rot / 360) * 360 + 720 + Math.floor(Math.random() * 360);
     const pocketAt = wheelTo + WHEEL_ORDER.indexOf(outcome.number) * STEP;
@@ -94,7 +97,7 @@ export function Roulette({ profile, onUpdate }: { profile: Profile; onUpdate: (u
 
   return (
     <div className="table roulette">
-      <section className="felt wheel-area" aria-label="Rulettipyörä">
+      <section className="felt wheel-area" aria-label="Rulettipyörä" ref={wheelArea}>
         <div className="r-wheel" aria-hidden="true">
           <svg className="r-static" viewBox="-100 -100 200 200">
             <defs>
