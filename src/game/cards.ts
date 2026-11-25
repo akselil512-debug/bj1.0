@@ -57,7 +57,8 @@ export function handValue(cards: Card[]): { total: number; soft: boolean } {
 
 export const isBlackjack = (cards: Card[]) => cards.length === 2 && handValue(cards).total === 21;
 
-export const SUIT_SYMBOLS = ['♠', '♥', '♦', '♣'];
+// U+FE0E keeps phones from drawing the suits as emoji.
+export const SUIT_SYMBOLS = ['♠\uFE0E', '♥\uFE0E', '♦\uFE0E', '♣\uFE0E'];
 const SUIT_NAMES = ['pata', 'hertta', 'ruutu', 'risti'];
 const RANK_NAMES = ['', 'ässä', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'jätkä', 'kuningatar', 'kuningas'];
 const RANK_SHORT = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];

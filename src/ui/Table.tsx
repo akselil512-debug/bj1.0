@@ -199,6 +199,7 @@ export function Table({ profile, onUpdate, onSave, onBalance, notify }: Props) {
 
       <section className={round ? 'felt' : 'felt idle'} aria-label="Pelipöytä">
         <div className="rack" aria-hidden="true" />
+        <div className="shoe" aria-hidden="true" />
         <div className="seat">
           <h2 className="seat-title">
             Jakaja
@@ -213,7 +214,19 @@ export function Table({ profile, onUpdate, onSave, onBalance, notify }: Props) {
           </div>
         </div>
 
-        <p className="felt-rule">Blackjack maksaa 3:2 · Jakaja jää 17:ään</p>
+        {round ? (
+          <div className="felt-print">
+            <svg viewBox="0 0 300 66" aria-hidden="true">
+              <path id="print-arc-1" d="M 16 8 Q 150 50 284 8" fill="none" />
+              <path id="print-arc-2" d="M 40 30 Q 150 68 260 30" fill="none" />
+              <text className="print-main"><textPath href="#print-arc-1" startOffset="50%" textAnchor="middle">BLACKJACK MAKSAA 3:2</textPath></text>
+              <text className="print-sub"><textPath href="#print-arc-2" startOffset="50%" textAnchor="middle">Jakaja jää 17:ään · Vakuutus maksaa 2:1</textPath></text>
+            </svg>
+            <p className="sr-only">Blackjack maksaa 3:2. Jakaja jää 17:ään. Vakuutus maksaa 2:1.</p>
+          </div>
+        ) : (
+          <p className="felt-rule">Blackjack maksaa 3:2 · Jakaja jää 17:ään</p>
+        )}
 
         <div className={`hands count-${Math.min(round?.hands.length ?? 1, 5)}`}>
           {round ? (
@@ -377,6 +390,7 @@ function HandView({ hand, index, many, active }: { hand: Hand; index: number; ma
         {hand.cards.map((c, i) => <CardView key={i} card={c} index={i} />)}
       </div>
       <p className="hand-bet">
+        <span className="stack" aria-hidden="true"><i /><i /><i /></span>
         {money(hand.bet)}
         {hand.extra > 0 && ' + talon tupla'}
         {hand.outcome && <span className={`badge ${hand.outcome}`}>{OUTCOME_LABELS[hand.outcome]}</span>}

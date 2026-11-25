@@ -376,3 +376,13 @@ svg.r-pockets { width: calc(100% - 18px); height: calc(100% - 18px); }
 .r-hub { inset: 37%; font-size: 1.9rem; }
 .r-info { align-items: center; text-align: center; flex: 0 0 auto; }
 .r-info .result-line { text-align: center; }
+
+/* Realistic roulette wheel: wooden bowl, ball track, brass frets, cone and turret */
+.r-wheel { width: min(300px, 80vw); height: min(300px, 80vw); background: none; box-shadow: 0 14px 28px oklch(0 0 0 / 0.6), 0 2px 0 oklch(1 0 0 / 0.15) inset; }
+.r-static, .r-rotor, .r-orbit, .r-gloss { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; }
+.r-rotor { transition: transform cubic-bezier(0.12, 0.6, 0.18, 1); }
+.r-orbit { transition: transform cubic-bezier(0.1, 0.55, 0.2, 1); pointer-events: none; }
+.r-ball { left: 50%; top: 5.2%; width: 4.6%; height: 4.6%; margin-left: -2.3%; background: radial-gradient(circle at 34% 28%, oklch(1 0 0), oklch(0.9 0 0) 45%, oklch(0.62 0 0)); box-shadow: 1px 2px 3px oklch(0 0 0 / 0.75); transition: top 0.25s ease-out; }
+.r-ball.in { top: 18%; transition: top 1.3s cubic-bezier(0.5, 0, 0.9, 0.6) 2.5s; }
+.calm .r-ball.in { transition: none; }
+.r-gloss { pointer-events: none; background: radial-gradient(ellipse 60% 42% at 34% 22%, oklch(1 0 0 / 0.26), transparent 70%), radial-gradient(ellipse 70% 50% at 70% 88%, oklch(0 0 0 / 0.3), transparent 70%); }

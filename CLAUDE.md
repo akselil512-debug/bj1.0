@@ -172,6 +172,7 @@ Päätökset:
 | 2026-11-22 | Pelaaja voi pelata 1–5 kättä rinnakkain (STORY-020). Panos, sivupanokset ja bonukset ovat käsikohtaisia, vakuutus kattaa kaikki kädet. |
 | 2026-11-22 | Ilmoitukset näytetään yksi kerrallaan, jotta ne eivät peitä pöytää. Vitsirivi (JOKERI) jätetään vastauksista pois, koska roolileikki ärsytti käyttäjää. |
 | 2026-11-22 | Designluonnokset (canvas "Saloon 21 – nya designskisser", 11 näkymää) rakennetaan peliin vaiheittain. Vaihe 1: aula, uusi kiiltävä ulkoasu, eurooppalainen ruletti ja päivän pyörä (EPIC-006). |
+| 2026-11-25 | Ulkoasusta tehdään todenmukaisempi ilman valokuvia: rulettipyörässä oikea numerojärjestys, puukehä, kuularata ja pyörivä kuula; pelikorteissa kulmamerkit, maamerkit ja kuvakorttien paneelit; pöydässä huopa, pehmustettu reuna, painetut kaaret, merkkiteline ja korttikenkä; pelimerkit kasinotyyliin. Tyylit ovat tiedostossa `src/ui/realistic.css`. |
 | 2026-11-22 | Käyttäjä kirjoittaa välillä ruotsiksi. Doc vastaa käyttäjän viestin kielellä, pelin tekstit pysyvät suomeksi. |
 
 Tilanne 2026-11-22 ilta: peli avautuu aulaan, ja mukana ovat ruletti ja päivän pyörä (70 yksikkötestiä ja 8 selaintestiä läpi). Designista toteuttamatta: moninpelipöydät, pöytälista ja tulostaulu (vaativat palvelimen), kokoelma sekä live-jakaja (vaatii oman tai lisensoidun kuva- tai videoaineiston).

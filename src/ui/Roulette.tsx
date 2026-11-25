@@ -9,19 +9,23 @@ const ROWS = [0, 1, 2].map((row) => Array.from({ length: 12 }, (_, col) => col *
 const DOZENS: OutsideBet[] = ['d1', 'd2', 'd3'];
 const EVEN_MONEY: OutsideBet[] = ['low', 'even', 'red', 'black', 'odd', 'high'];
 const CHIPS = [100, 500, 1000, 5000];
-const SPIN_MS = 3600;
+const SPIN_MS = 4600;
 const STEP = 360 / POCKETS;
 const POCKET_FILL = { red: 'oklch(0.5 0.19 27)', black: 'oklch(0.16 0.02 60)', green: 'oklch(0.4 0.12 150)' };
 
-/** A ring segment of the wheel, centred on the top and `STEP` degrees wide. */
-const WEDGE = (() => {
+/** A ring segment centred on the top and `STEP` degrees wide, between two radii. */
+function wedge(outer: number, inner: number): string {
   const point = (r: number, deg: number) => {
     const rad = ((deg - 90) * Math.PI) / 180;
     return `${(r * Math.cos(rad)).toFixed(2)} ${(r * Math.sin(rad)).toFixed(2)}`;
   };
   const half = STEP / 2;
-  return `M ${point(96, -half)} A 96 96 0 0 1 ${point(96, half)} L ${point(64, half)} A 64 64 0 0 0 ${point(64, -half)} Z`;
-})();
+  return `M ${point(outer, -half)} A ${outer} ${outer} 0 0 1 ${point(outer, half)} L ${point(inner, half)} A ${inner} ${inner} 0 0 0 ${point(inner, -half)} Z`;
+}
+const NUMBER_WEDGE = wedge(86, 67);
+const POCKET_WEDGE = wedge(67, 52);
+const WIN_WEDGE = wedge(86, 52);
+const POCKET_SHADE = { red: 'oklch(0.4 0.16 27)', black: 'oklch(0.11 0.01 60)', green: 'oklch(0.32 0.1 150)' };
 
 const short = (v: number) => (v >= 1000 ? `${String(v / 1000).replace('.', ',')}k` : `${v}`);
 const prefersStill = () => typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -31,6 +35,8 @@ export function Roulette({ profile, onUpdate }: { profile: Profile; onUpdate: (u
   const [chip, setChip] = useState(500);
   const [spinning, setSpinning] = useState(false);
   const [rot, setRot] = useState(0);
+  const [ballRot, setBallRot] = useState(0);
+  const [ballIn, setBallIn] = useState(false);
   const [result, setResult] = useState<SpinResult | null>(null);
   const [history, setHistory] = useState<number[]>([]);
   const [message, setMessage] = useState('');
@@ -38,7 +44,9 @@ export function Roulette({ profile, onUpdate }: { profile: Profile; onUpdate: (u
   latest.current = profile;
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  useEffect(() => () => clearTimeout(timer.current), []);
+  const dropTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => () => { clearTimeout(timer.current); clearTimeout(dropTimer.current); }, []);
 
   const stake = totalStake(bets);
   const still = profile.settings.calm || prefersStill();
@@ -56,8 +64,14 @@ export function Roulette({ profile, onUpdate }: { profile: Profile; onUpdate: (u
     const outcome = settle(bets, spinNumber(Math.random));
     setSpinning(true);
     setResult(null);
-    // Four full turns, then stop with the winning pocket under the ball at the top.
-    setRot((r) => Math.ceil(r / 360) * 360 + 1440 - WHEEL_ORDER.indexOf(outcome.number) * STEP);
+    // The wheel turns clockwise and the ball runs the other way, then drops into the winning pocket.
+    const wheelTo = Math.ceil(rot / 360) * 360 + 720 + Math.floor(Math.random() * 360);
+    const pocketAt = wheelTo + WHEEL_ORDER.indexOf(outcome.number) * STEP;
+    const ballTo = pocketAt - 360 * Math.ceil((pocketAt - (ballRot - 1440)) / 360);
+    setRot(wheelTo);
+    setBallRot(ballTo);
+    setBallIn(still);
+    if (!still) dropTimer.current = setTimeout(() => setBallIn(true), 300);
     timer.current = setTimeout(
       () => {
         onUpdate(applyRoulette(latest.current, outcome, Date.now()));
@@ -82,18 +96,66 @@ export function Roulette({ profile, onUpdate }: { profile: Profile; onUpdate: (u
     <div className="table roulette">
       <section className="felt wheel-area" aria-label="Rulettipyörä">
         <div className="r-wheel" aria-hidden="true">
-          <svg className="r-pockets" viewBox="-100 -100 200 200" style={{ transform: `rotate(${rot}deg)`, transitionDuration: still ? '0s' : `${SPIN_MS}ms` }}>
+          <svg className="r-static" viewBox="-100 -100 200 200">
+            <defs>
+              <radialGradient id="r-wood" cx="35%" cy="30%" r="80%">
+                <stop offset="0" stopColor="oklch(0.5 0.1 55)" />
+                <stop offset="0.55" stopColor="oklch(0.33 0.08 45)" />
+                <stop offset="1" stopColor="oklch(0.18 0.04 40)" />
+              </radialGradient>
+              <linearGradient id="r-brass" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stopColor="oklch(0.97 0.05 95)" />
+                <stop offset="0.4" stopColor="oklch(0.78 0.13 85)" />
+                <stop offset="0.6" stopColor="oklch(0.55 0.11 75)" />
+                <stop offset="1" stopColor="oklch(0.88 0.1 90)" />
+              </linearGradient>
+              <radialGradient id="r-track" cx="50%" cy="50%" r="50%">
+                <stop offset="0.86" stopColor="oklch(0.2 0.04 45)" />
+                <stop offset="0.93" stopColor="oklch(0.42 0.09 55)" />
+                <stop offset="1" stopColor="oklch(0.26 0.06 45)" />
+              </radialGradient>
+              <radialGradient id="r-cone" cx="50%" cy="50%" r="50%">
+                <stop offset="0" stopColor="oklch(0.56 0.11 60)" />
+                <stop offset="0.7" stopColor="oklch(0.38 0.09 50)" />
+                <stop offset="1" stopColor="oklch(0.24 0.06 45)" />
+              </radialGradient>
+            </defs>
+            <circle r="100" fill="url(#r-wood)" />
+            <circle r="97.5" fill="none" stroke="url(#r-brass)" strokeWidth="1.2" />
+            <circle r="93" fill="url(#r-track)" />
+            <circle r="86.6" fill="none" stroke="url(#r-brass)" strokeWidth="1.2" />
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
+              <rect key={deg} x="-1.6" y="-92" width="3.2" height="5" rx="1.2" fill="url(#r-brass)" transform={`rotate(${deg + 22})`} />
+            ))}
+          </svg>
+
+          <svg className="r-rotor" viewBox="-100 -100 200 200" style={{ transform: `rotate(${rot}deg)`, transitionDuration: still ? '0s' : `${SPIN_MS}ms` }}>
             {WHEEL_ORDER.map((n, i) => (
               <g key={n} transform={`rotate(${(i * STEP).toFixed(3)})`}>
-                <path d={WEDGE} fill={POCKET_FILL[colorOf(n)]} stroke="oklch(0.82 0.14 85)" strokeWidth="0.6" />
-                <text y="-77" textAnchor="middle" fontSize="10.5" fontWeight="700" fill="white">{n}</text>
+                <path d={NUMBER_WEDGE} fill={POCKET_FILL[colorOf(n)]} />
+                <path d={POCKET_WEDGE} fill={POCKET_SHADE[colorOf(n)]} />
+                <text y="-73" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="white" fontFamily="Georgia, 'Times New Roman', serif">{n}</text>
+                <line x1="0" y1="-86" x2="0" y2="-52" stroke="url(#r-brass)" strokeWidth="0.9" transform={`rotate(${(STEP / 2).toFixed(3)})`} />
+                {result && !spinning && result.number === n && <path d={WIN_WEDGE} fill="none" stroke="oklch(0.95 0.12 95)" strokeWidth="1.8" />}
               </g>
             ))}
-            <circle r="64" fill="oklch(0.24 0.04 55)" stroke="oklch(0.68 0.14 75)" strokeWidth="2" />
-            <path d="M0 -60 V60 M-60 0 H60 M-42 -42 L42 42 M42 -42 L-42 42" stroke="oklch(0.68 0.14 75)" strokeWidth="1.5" />
+            <circle r="67" fill="none" stroke="url(#r-brass)" strokeWidth="0.9" />
+            <circle r="52" fill="url(#r-cone)" stroke="url(#r-brass)" strokeWidth="1.4" />
+            <circle r="30" fill="none" stroke="oklch(0.2 0.04 45 / 0.5)" strokeWidth="0.6" />
+            {[0, 90, 180, 270].map((deg) => (
+              <g key={deg} transform={`rotate(${deg})`}>
+                <rect x="-1.5" y="-36" width="3" height="30" rx="1.5" fill="url(#r-brass)" />
+                <circle cy="-37" r="4.2" fill="url(#r-brass)" stroke="oklch(0.34 0.07 70)" strokeWidth="0.5" />
+              </g>
+            ))}
+            <circle r="13" fill="url(#r-brass)" stroke="oklch(0.34 0.07 70)" strokeWidth="0.8" />
+            <circle r="6" fill="oklch(0.9 0.08 92)" stroke="oklch(0.45 0.09 72)" strokeWidth="0.8" />
           </svg>
-          <div className="r-ball" />
-          <div className={`r-hub ${result ? colorOf(result.number) : ''}`}>{result ? result.number : spinning ? '' : '?'}</div>
+
+          <div className="r-orbit" style={{ transform: `rotate(${ballRot}deg)`, transitionDuration: still ? '0s' : `${SPIN_MS}ms` }}>
+            <div className={ballIn ? 'r-ball in' : 'r-ball'} />
+          </div>
+          <div className="r-gloss" />
         </div>
         <div className="r-info" aria-live="polite">
           {spinning && <p className="r-status">Kuula pyörii…</p>}

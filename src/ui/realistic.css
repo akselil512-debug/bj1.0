@@ -1,0 +1,111 @@
+/* Realistic cards, table and chips. Loaded after styles.css. */
+:root {
+  --felt-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Playing cards with corner indices, pips and court panels */
+.card:not(.card-back):not(.card-slot) {
+  background: linear-gradient(155deg, oklch(1 0 0) 0%, oklch(0.975 0.006 90) 50%, oklch(0.93 0.012 85) 100%);
+  border: 1px solid oklch(0.72 0.02 85);
+  border-radius: calc(var(--cw) * 0.09);
+  box-shadow: 0 1px 0 oklch(1 0 0 / 0.9) inset, 0 3px 7px oklch(0 0 0 / 0.5), 0 0 0 0.5px oklch(0 0 0 / 0.25);
+  overflow: hidden;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+.card.red { color: oklch(0.5 0.21 27); }
+.card.black { color: oklch(0.17 0.01 260); }
+.card-corner { position: absolute; display: flex; flex-direction: column; align-items: center; width: calc(var(--cw) * 0.26); font-weight: 700; font-size: calc(var(--cw) * 0.27); line-height: 0.95; letter-spacing: -0.04em; }
+.card-corner small { font-size: calc(var(--cw) * 0.21); line-height: 1; letter-spacing: 0; }
+.card-corner.tl { left: 3%; top: 3%; }
+.card-corner.br { right: 3%; bottom: 3%; transform: rotate(180deg); }
+.card-pips, .card-court { position: absolute; inset: 0; }
+.pip { position: absolute; font-size: calc(var(--cw) * 0.27); line-height: 1; transform: translate(-50%, -50%); }
+.pip.flip { transform: translate(-50%, -50%) rotate(180deg); }
+.card.ace .pip { font-size: calc(var(--cw) * 0.62); }
+.card-court {
+  inset: 13% 24% 13% 24%; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4% 0;
+  border: 1px solid currentColor; border-radius: calc(var(--cw) * 0.04);
+  background: linear-gradient(135deg, oklch(0.9 0.09 95 / 0.75) 0 50%, oklch(0.84 0.07 250 / 0.6) 50% 100%);
+}
+.card.red .card-court { background: linear-gradient(135deg, oklch(0.9 0.09 95 / 0.75) 0 50%, oklch(0.84 0.09 25 / 0.55) 50% 100%); }
+.card-court b { font-size: calc(var(--cw) * 0.36); line-height: 1; }
+.card-court b.flip { transform: rotate(180deg); }
+.card-court i { font-style: normal; font-size: calc(var(--cw) * 0.3); line-height: 1; }
+.card-back {
+  border: calc(var(--cw) * 0.05) solid oklch(0.97 0.01 85);
+  border-radius: calc(var(--cw) * 0.09);
+  background: repeating-linear-gradient(45deg, oklch(0.36 0.14 27) 0 3px, transparent 3px 7px), repeating-linear-gradient(-45deg, oklch(0.36 0.14 27) 0 3px, oklch(0.48 0.17 27) 3px 7px);
+  box-shadow: 0 3px 7px oklch(0 0 0 / 0.5), 0 0 0 0.5px oklch(0 0 0 / 0.3);
+}
+.back-inner { position: absolute; inset: 14% 18%; border: 1.5px solid oklch(0.97 0.01 85 / 0.9); border-radius: 40%; background: radial-gradient(circle, oklch(0.82 0.14 85) 0 18%, oklch(0.36 0.14 27) 19% 100%); }
+
+/* Blackjack table: felt grain, padded rail, printed arcs, chip tray and shoe */
+.felt {
+  position: relative; border: 10px solid transparent;
+  background: var(--felt-noise) padding-box, radial-gradient(ellipse 95% 75% at 50% 15%, oklch(0.5 0.11 155), oklch(0.37 0.09 155) 58%, oklch(0.27 0.07 155)) padding-box, linear-gradient(160deg, oklch(0.44 0.07 50), oklch(0.2 0.04 45) 38%, oklch(0.35 0.06 50) 68%, oklch(0.15 0.03 40)) border-box;
+  box-shadow: 0 12px 26px oklch(0 0 0 / 0.55), inset 0 0 0 2px oklch(0.78 0.13 85 / 0.85), inset 0 8px 16px oklch(0 0 0 / 0.4);
+}
+.table:not(.roulette) .felt:not(.idle) { border-radius: 24px 24px 86px 86px / 24px 24px 58px 58px; padding: 12px 8px 30px; }
+.felt-print svg { display: block; width: 100%; max-width: 330px; margin: 0 auto; }
+.print-main { font-family: var(--display); font-size: 15px; font-weight: 700; letter-spacing: 0.1em; fill: oklch(0.88 0.13 92); }
+.print-sub { font-family: var(--body); font-size: 9.5px; font-weight: 600; letter-spacing: 0.06em; fill: oklch(0.93 0.05 120); }
+.rack {
+  height: 22px; margin: -2px 16% 4px; border-radius: 6px; border: 2px solid oklch(0.8 0.01 85);
+  background: repeating-linear-gradient(180deg, transparent 0 3px, oklch(0 0 0 / 0.28) 3px 4px), repeating-linear-gradient(90deg, oklch(0.5 0.19 27) 0 15px, oklch(0.25 0.01 85) 15px 17px, oklch(0.42 0.12 250) 17px 32px, oklch(0.25 0.01 85) 32px 34px, oklch(0.4 0.1 155) 34px 49px, oklch(0.25 0.01 85) 49px 51px, oklch(0.18 0.02 60) 51px 66px, oklch(0.25 0.01 85) 66px 68px, oklch(0.8 0.14 85) 68px 83px, oklch(0.25 0.01 85) 83px 85px);
+  box-shadow: inset 0 3px 4px oklch(0 0 0 / 0.55), 0 1px 0 oklch(1 0 0 / 0.5), 0 3px 5px oklch(0 0 0 / 0.45);
+}
+.shoe { position: absolute; right: 12px; top: 10px; width: 40px; height: 30px; border-radius: 5px 5px 3px 3px; border: 1px solid oklch(1 0 0 / 0.65); background: linear-gradient(135deg, oklch(1 0 0 / 0.55), oklch(1 0 0 / 0.12) 42%, oklch(1 0 0 / 0.32) 62%, oklch(1 0 0 / 0.08)); box-shadow: 0 3px 6px oklch(0 0 0 / 0.5); transform: rotate(8deg); }
+.shoe::after { content: ''; position: absolute; left: 6px; right: 6px; top: 7px; bottom: 4px; border-radius: 2px; border: 1.5px solid oklch(0.97 0.01 85); background: repeating-linear-gradient(45deg, oklch(0.42 0.14 27) 0 3px, oklch(0.32 0.12 27) 3px 6px); }
+.felt.idle .shoe { display: none; }
+.hand.active { background: oklch(0.2 0.05 155 / 0.45); border-color: var(--gold); box-shadow: 0 0 14px oklch(0.82 0.14 85 / 0.45); }
+.stack { display: inline-flex; flex-direction: column-reverse; align-items: center; margin-right: 2px; }
+.stack i { display: block; width: 22px; height: 8px; margin-top: -4px; border-radius: 50%; background: repeating-linear-gradient(90deg, oklch(0.97 0.01 85) 0 3px, oklch(0.5 0.19 27) 3px 8px); border: 1px solid oklch(0.3 0.1 27); box-shadow: 0 1.5px 0 oklch(0.3 0.1 27); }
+.stack i:last-child { margin-top: 0; background: radial-gradient(ellipse, oklch(0.58 0.2 27) 0 55%, oklch(0.97 0.01 85) 56% 70%, oklch(0.5 0.19 27) 71%); }
+
+/* Casino chips */
+.chips .chip, .r-chips .chip {
+  position: relative; width: 56px; height: 56px; justify-self: center; border: 0; border-radius: 50%; color: white;
+  font-family: var(--display); font-size: 0.9rem; text-shadow: 0 1px 1px oklch(0 0 0 / 0.6);
+  background: radial-gradient(circle, var(--chip) 0 44%, oklch(1 0 0 / 0.9) 45% 48%, var(--chip) 49% 58%, transparent 59%), repeating-conic-gradient(oklch(0.97 0.01 85) 0 14deg, var(--chip) 14deg 45deg);
+  box-shadow: 0 3px 0 var(--chip-edge), 0 6px 8px oklch(0 0 0 / 0.45), inset 0 0 0 1px oklch(0 0 0 / 0.25);
+}
+.chips .chip:nth-child(1), .r-chips .chip:nth-child(1) { --chip: oklch(0.48 0.18 27); --chip-edge: oklch(0.3 0.12 27); }
+.chips .chip:nth-child(2), .r-chips .chip:nth-child(2) { --chip: oklch(0.42 0.13 250); --chip-edge: oklch(0.27 0.09 250); }
+.chips .chip:nth-child(3), .r-chips .chip:nth-child(3) { --chip: oklch(0.4 0.11 155); --chip-edge: oklch(0.26 0.08 155); }
+.chips .chip:nth-child(4), .r-chips .chip:nth-child(4) { --chip: oklch(0.22 0.02 60); --chip-edge: oklch(0.1 0.01 60); }
+.chips .chip:nth-child(5) { --chip: oklch(0.42 0.14 310); --chip-edge: oklch(0.27 0.1 310); }
+.chips .chip:active:not(:disabled), .r-chips .chip:active { transform: translateY(2px); }
+.r-chips .chip.selected { box-shadow: 0 0 0 3px var(--gold), 0 3px 0 var(--chip-edge), 0 6px 8px oklch(0 0 0 / 0.45); }
+.r-grid { background: var(--felt-noise), oklch(0.32 0.08 155); }
+.r-cell { font-family: Georgia, 'Times New Roman', serif; font-size: 1.05rem; }
+.r-cell.outside { font-family: var(--body); }
+
+/* Keep the table compact on a phone and the action buttons always within reach */
+.felt-print svg { max-width: 250px; }
+.table:not(.roulette) .felt:not(.idle) { gap: 2px; padding: 8px 6px 24px; min-height: 0; }
+.hands { gap: 4px 6px; }
+.hands.count-3, .hands.count-4, .hands.count-5 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); justify-items: center; }
+.hands.count-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); --cw: 38px; }
+.hands.count-5 { --cw: 40px; }
+.hands.count-3 .hand, .hands.count-4 .hand, .hands.count-5 .hand { padding: 4px 2px; }
+.hands.count-3 .turn, .hands.count-4 .turn, .hands.count-5 .turn { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.hands.count-4 .seat-title, .hands.count-5 .seat-title { font-size: 0.8rem; gap: 4px; }
+.hands.count-4 .hand-bet, .hands.count-5 .hand-bet { font-size: 0.75rem; }
+.table:not(.roulette) > .controls { position: sticky; bottom: 68px; z-index: 4; background: linear-gradient(180deg, oklch(1 0 0 / 0.1) 0%, oklch(1 0 0 / 0.02) 60px, transparent 64px), oklch(0.3 0.045 58); }
+
+/* Tighter layout so one hand and its buttons fit a phone screen without scrolling */
+.table:not(.roulette) .felt:not(.idle) { border-radius: 22px 22px 70px 70px / 22px 22px 44px 44px; padding: 6px 6px 16px; }
+.table:not(.roulette) .felt:not(.idle) > .seat { --cw: 52px; gap: 3px; }
+.hands.count-1 { --cw: 56px; }
+.felt-print svg { max-width: 215px; }
+.rack { height: 18px; margin-bottom: 2px; }
+.hand { padding: 3px 8px; }
+.hand .seat-title, .seat .seat-title { margin: 0; }
+.table:not(.roulette) > .controls { gap: 6px; padding: 8px; }
+.table:not(.roulette) .hint { font-size: 0.85rem; padding: 5px 8px; line-height: 1.3; }
+.table:not(.roulette) .actions { gap: 6px; }
+.table:not(.roulette) .actions .main-action { min-height: 50px; font-size: 1.05rem; }
+.table:not(.roulette) .actions .action:not(.main-action) { min-height: 44px; }
+.bottom-nav { margin-top: 6px; }
+.r-wheel { overflow: hidden; }
+.main { overflow-x: clip; }
